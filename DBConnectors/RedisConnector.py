@@ -1,5 +1,5 @@
 from functools import partial
-from typing import Union, Callable
+from typing import Union, Callable, List
 
 from redis import Redis
 from redis.exceptions import ConnectionError, ResponseError
@@ -52,3 +52,16 @@ class RedisConnector(AbstractDBConnector):
 
     def get(self, key: str) -> str:
         return self.call(partial(self.get_redis().get, key))
+
+    def exists(self, key: str) -> bool:
+        return self.call(partial(self.get_redis().exists, key))
+
+    def delete_key(self, key: str) -> None:
+        self.call(partial(self.get_redis().delete, key))
+
+    def delete_keys(self, keys: List[str]) -> None:
+        for key in keys:
+            self.call(partial(self.delete_key, key))
+
+    def list(self, keys_filter: str = '') -> list:
+        return [key.decode() for key in self.call(partial(self.get_redis().scan_iter, keys_filter))]

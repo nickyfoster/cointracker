@@ -8,9 +8,9 @@ from utils.utils import get_config
 
 class CoinmarketcapAPI:
     def __init__(self):
-        # self.url = "https://pro-api.coinmarketcap.com" # TODO change when finished testing
-        self.url = "https://sandbox-api.coinmarketcap.com"
         self.config = get_config().coinmarketcap
+        api_type = "sandbox" if self.config.sandbox else "pro"
+        self.url = f"https://{api_type}-api.coinmarketcap.com"
         self.api_key = self.config.api_key
         self.session = self.ini_connection()
 
@@ -40,6 +40,3 @@ class CoinmarketcapAPI:
             return data
         except (ConnectionError, Timeout, TooManyRedirects) as e:
             print(e)
-
-
-

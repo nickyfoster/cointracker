@@ -6,3 +6,4 @@ db:
 
 coinmarketcap:
   api_key: THISISASECRET
+  sandbox: no

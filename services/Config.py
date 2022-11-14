@@ -28,9 +28,11 @@ class DBConfig:
     db: int
     password: str
 
+
 @dataclass
 class CoinmarketcapApiConfig:
     api_key: str
+    sandbox: bool
 
 
 @nested_dataclass
