@@ -2,7 +2,7 @@ import json
 import time
 
 from services.CoinmarketcapAPI import CoinmarketcapAPI
-from utils.utils import get_db_connector
+from utils.utils import get_db_connector, update_nested_dict, load_yml
 
 
 class Cointracker:
@@ -10,62 +10,68 @@ class Cointracker:
         self.db = get_db_connector()
         self.api = CoinmarketcapAPI()
 
-    def update_coin(self, coin_symbol: str, data: dict):
+    def set_coin_data(self, coin_symbol: str, data: dict):
         data["last_updated"] = time.time()
         self.db.set(f"coin/{coin_symbol.lower()}", json.dumps(data))
 
-    def get_coin(self, coin_symbol: str):
+    def get_coin_data(self, coin_symbol: str):
         coin_key = f"coin/{coin_symbol.lower()}"
         if self.db.exists(coin_key):
             return json.loads(self.db.get(coin_key))
+        else:
+            return dict()
 
-    def fill_db(self, coins_data: dict):
-        api_data = self.api.get_currency_quotes_latest(list(coins_data.keys()))
-        for coin_symbol, coin_amount in coins_data.items():
-            data = {"amount": coin_amount, "data": api_data['data'][coin_symbol.upper()][0]}
-            self.update_coin(coin_symbol, data)
+    def update_coins_data(self, coins: list):
+        api_data = self.api.get_currency_quotes_latest(coins)
+        for _coin_symbol in coins:
+            current_data = self.get_coin_data(_coin_symbol)
+            res_data = update_nested_dict(current_data, api_data['data'][_coin_symbol.upper()][0])
+            self.set_coin_data(_coin_symbol, res_data)
 
-    def get_portfolio(self):
-        coins = self.db.list('coin/*')
-        total = 0
+    def update_coin_amount(self, coin_symbol: str, amount: float):
+        data = self.get_coin_data(coin_symbol)
+        data["amount"] = str(amount)
+        self.set_coin_data(coin_symbol, data)
+
+    def add_coin(self, coin_symbol: str, amount: float):
+        self.set_coin_data(coin_symbol, {"amount": str(amount)})
+        self.update_coins_data([coin_symbol])
+
+    def delete_coin(self, coin_symbol):
+        self.db.delete_key(f"coin/{coin_symbol.lower()}")
+
+    def list_coins(self):
+        coins = self.db.list("coin/*")
+        res = list()
         for coin in coins:
-            coin_info = self.get_coin(coin.split("coin/")[1])
-            coin_name = coin_info['data']['name']
-            coin_total = float(coin_info['data']['quote']['USD']['price']) * float(coin_info['amount'])
+            res.append(coin.split('coin/')[1])
+        return res
 
-            print(f"{coin_name}: {round(coin_total, 2)} USD")
-            total += coin_total
-        print(total)
+    def fill_db(self, coins_raw_data: dict):
+        for coin_name, coin_amount in coins_raw_data.items():
+            self.update_coin_amount(coin_name, float(coin_amount))
 
-        # portfolio_total = 1000
-        # coins = []
-        # portfolio = {"portfolio_total": portfolio_total,
-        #              "coins": coins}
-        # return portfolio
+    def get_portfolio_data(self):
+        coins_symbols = self.list_coins()
+        result = dict()
+        for coin_symbol in coins_symbols:
+            data = self.get_coin_data(coin_symbol)
+            result[coin_symbol] = data
+        return result
 
-        '''
-        
-        data:
-        
-        {
-        total holdings in usd
-        coins:
-            name
-            price
-            price change (1h,6h etc)
-            holdings in USD
-            amount of coins
-        }
-        
-        '''
+    def get_portfolio_price(self):
+        portfolio_data = self.get_portfolio_data()
+        portfolio_price = 0
+        for coin_symbol, coin_data in portfolio_data.items():
+            portfolio_price += float(coin_data['quote']['USD']['price']) * float(coin_data['amount'])
+        return round(portfolio_price, 2)
 
 
 if __name__ == '__main__':
     tracker = Cointracker()
 
-    # from pathlib import Path
-    # from utils.utils import load_yml
-    # coins = load_yml(Path(__file__).parent / '..' / 'coins.yml')
-    # tracker.fill_db(coins)
+    # tracker.fill_db(load_yml("../coins.yml"))
+    # tracker.update_coins_data(coins_symbols)
 
-    tracker.get_portfolio()
+    res = tracker.get_portfolio_data()
+    print(res)

@@ -34,8 +34,13 @@ class CoinmarketcapApiConfig:
     api_key: str
     sandbox: bool
 
+@dataclass
+class TelegramConfig:
+    api_key: str
+    users: list
 
 @nested_dataclass
 class Config:
     db: DBConfig
     coinmarketcap: CoinmarketcapApiConfig
+    telegram: TelegramConfig

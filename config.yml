@@ -7,3 +7,8 @@ db:
 coinmarketcap:
   api_key: THISISASECRET
   sandbox: no
+
+telegram:
+  api_key: THISISASECRET
+  users:
+    - thisisausername
