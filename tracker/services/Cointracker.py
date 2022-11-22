@@ -1,8 +1,8 @@
 import json
 import time
 
-from services.CoinmarketcapAPI import CoinmarketcapAPI
-from utils.utils import get_db_connector, update_nested_dict, load_yml
+from tracker.services.CoinmarketcapAPI import CoinmarketcapAPI
+from tracker.utils.utils import get_db_connector, update_nested_dict
 
 
 class Cointracker:

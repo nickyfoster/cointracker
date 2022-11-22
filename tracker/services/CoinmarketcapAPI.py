@@ -3,7 +3,7 @@ import json
 from requests import Session
 from requests.exceptions import ConnectionError, Timeout, TooManyRedirects
 
-from utils.utils import get_config
+from tracker.utils.utils import get_config
 
 
 class CoinmarketcapAPI:

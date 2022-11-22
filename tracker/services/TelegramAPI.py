@@ -3,9 +3,9 @@ import logging
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import Application, CallbackQueryHandler, CommandHandler, ContextTypes, filters
 
-from services.Cointracker import Cointracker
-from services.Exception import CustomException
-from utils.utils import get_config
+from tracker.services.Cointracker import Cointracker
+from tracker.services.Exception import CustomException
+from tracker.utils.utils import get_config
 
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
@@ -44,19 +44,19 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     await query.edit_message_text(text=reply_text)
 
 
-async def error_handler(update: object, context: ContextTypes.DEFAULT_TYPE) -> None:
+async def error_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    query = update.callback_query
     logger.error(msg="Exception while handling an update:", exc_info=context.error)
-    await context.bot.send_message(chat_id=DEVELOPER_CHAT_ID, text="Error")
+
+    await query.answer()
+    await query.edit_message_text(text=f"An error occured: {context.error}")
 
 
-def main() -> None:
+def start_bot() -> None:
     config = get_config().telegram
     application = Application.builder().token(config.api_key).build()
     application.add_handler(CommandHandler("start", start, filters=filters.User(username=config.users)))
     application.add_handler(CallbackQueryHandler(button))
-    # application.add_error_handler(error_handler)
+    application.add_error_handler(error_handler)
     application.run_polling()
 
-
-if __name__ == "__main__":
-    main()

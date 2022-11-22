@@ -1,5 +1,5 @@
 # cointracker files
-config-local.yml
+tracker/config-local.yml
 coins.yml
 
 # Created by https://www.gitignore.io/api/macos,linux,django,python,pycharm

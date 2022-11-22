@@ -14,10 +14,10 @@ pipeline {
                 }
             }
         }
-        stage('Installing packages') {
+        stage('Build Docker Image') {
             steps {
                 script {
-                    sh 'pip install -r requirements.txt'
+                    sh 'docker build . -t cointracker:{currentBuild.number} -t cointracker:latest'
                 }
             }
         }

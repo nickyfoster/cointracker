@@ -4,8 +4,8 @@ from pathlib import Path
 
 import yaml
 
-from DBConnectors.RedisConnector import RedisConnector
-from services.Config import Config
+from tracker.DBConnectors.RedisConnector import RedisConnector
+from tracker.services.Config import Config
 
 
 def load_yml(file):

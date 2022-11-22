@@ -4,11 +4,11 @@ from typing import Union, Callable, List
 from redis import Redis
 from redis.exceptions import ConnectionError, ResponseError
 
-from DBConnectors.AbstractDBConnector import AbstractDBConnector
-from services.Config import DBConfig
-from services.Exception import CustomException
-from services.ExceptionCode import ExceptionCode
-from services.ExceptionMessage import ExceptionMessage
+from tracker.DBConnectors.AbstractDBConnector import AbstractDBConnector
+from tracker.services.Config import DBConfig
+from tracker.services.Exception import CustomException
+from tracker.services.ExceptionCode import ExceptionCode
+from tracker.services.ExceptionMessage import ExceptionMessage
 
 
 class RedisConnector(AbstractDBConnector):
