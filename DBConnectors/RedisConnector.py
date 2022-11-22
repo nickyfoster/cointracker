@@ -27,9 +27,6 @@ class RedisConnector(AbstractDBConnector):
         except Exception as e:
             print(e)
 
-    def get_redis(self):
-        return self.redis
-
     def set_redis(self):
         self.redis.close()
         self.redis = self.init_redis()
@@ -37,31 +34,31 @@ class RedisConnector(AbstractDBConnector):
     def call(self, fnc: Callable):
         try:
             return fnc()
-        except ResponseError:
-            raise CustomException(code=ExceptionCode.INTERNAL_SERVER_ERROR,
-                                  message=ExceptionMessage.COINTRACKER_DB_REDIS_WRONG_PASS)
         except ConnectionError:
             raise CustomException(code=ExceptionCode.INTERNAL_SERVER_ERROR,
                                   message=ExceptionMessage.COINTRACKER_DB_REDIS_UNABLE_TO_CONNECT)
+        except ResponseError:
+            raise CustomException(code=ExceptionCode.INTERNAL_SERVER_ERROR,
+                                  message=ExceptionMessage.COINTRACKER_DB_REDIS_WRONG_PASS)
 
     def close(self) -> None:
-        self.call(self.get_redis().close)
+        self.call(self.redis.close)
 
     def set(self, key: str, data: Union) -> None:
-        self.call(partial(self.get_redis().set, key, data))
+        self.call(partial(self.redis.set, key, data))
 
     def get(self, key: str) -> str:
-        return self.call(partial(self.get_redis().get, key))
+        return self.call(partial(self.redis.get, key))
 
     def exists(self, key: str) -> bool:
-        return self.call(partial(self.get_redis().exists, key))
+        return self.call(partial(self.redis.exists, key))
 
     def delete_key(self, key: str) -> None:
-        self.call(partial(self.get_redis().delete, key))
+        self.call(partial(self.redis.delete, key))
 
     def delete_keys(self, keys: List[str]) -> None:
         for key in keys:
             self.call(partial(self.delete_key, key))
 
     def list(self, keys_filter: str = '') -> list:
-        return [key.decode() for key in self.call(partial(self.get_redis().scan_iter, keys_filter))]
+        return [key.decode() for key in self.call(partial(self.redis.scan_iter, keys_filter))]
