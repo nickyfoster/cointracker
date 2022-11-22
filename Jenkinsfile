@@ -17,7 +17,7 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    sh 'docker build . -t cointracker:${env.BUILD_NUMBER} -t cointracker:latest'
+                    sh "docker build . -t cointracker:${env.BUILD_NUMBER} -t cointracker:latest"
                 }
             }
         }
