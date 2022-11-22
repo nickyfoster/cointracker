@@ -9,8 +9,8 @@ pipeline {
             steps {
                 script {
                     git branch: "master",
-                        credentialsId: 'my-credentials',
-                        url: 'https://user@github.org/myproject/sample-repo.git'
+                        credentialsId: 'github-creds',
+                        url: 'https://github.com/nickyfoster/cointracker.git'
                 }
             }
         }
