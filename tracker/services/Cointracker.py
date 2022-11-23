@@ -28,6 +28,9 @@ class Cointracker:
             res_data = update_nested_dict(current_data, api_data['data'][_coin_symbol.upper()][0])
             self.set_coin_data(_coin_symbol, res_data)
 
+    def update_all_coins(self):
+        self.update_coins_data(self.list_coins())
+
     def update_coin_amount(self, coin_symbol: str, amount: float):
         data = self.get_coin_data(coin_symbol)
         data["amount"] = str(amount)
@@ -61,17 +64,13 @@ class Cointracker:
 
     def get_portfolio_price(self):
         portfolio_data = self.get_portfolio_data()
+        result = dict()
         portfolio_price = 0
+        last_update_time = 0
+
         for coin_symbol, coin_data in portfolio_data.items():
+            last_update_time += float(coin_data["last_updated"])
             portfolio_price += float(coin_data['quote']['USD']['price']) * float(coin_data['amount'])
-        return round(portfolio_price, 2)
-
-
-if __name__ == '__main__':
-    tracker = Cointracker()
-
-    # tracker.fill_db(load_yml("../coins.yml"))
-    # tracker.update_coins_data(coins_symbols)
-
-    res = tracker.get_portfolio_data()
-    print(res)
+        result["last_updated"] = last_update_time / len(portfolio_data)
+        result["portfolio_price"] = round(portfolio_price, 2)
+        return result
