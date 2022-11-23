@@ -1,26 +1,45 @@
 ---
-- name: Ansible Test Playbook
+- name: cointracker
   gather_facts: false
   hosts: tag_Name_infra_server
   vars:
-    image_name: 381171443050.dkr.ecr.us-east-2.amazonaws.com/cointracker
+    registry_url: 381171443050.dkr.ecr.us-east-2.amazonaws.com
+    image_name: cointracker
     image_tag: latest
   tasks:
-    - name: Docker Login
+    - name: Docker login
+      tags: docker_login
       community.docker.docker_login:
+        registry_url: "{{ registry_url }}"
         username: AWS
-        password: CHANGEME
+        password: "{{ aws_ecr_password_1 }}{{ aws_ecr_password_2 }}"
 
-    - name: Pull Docker Image
+    - name: Pull Docker image
+      tags: docker_pull
       community.docker.docker_image:
-        name: "{{ image_name }}:{{ image_tag}}"
+        name: "{{ registry_url }}/{{ image_name }}:{{ image_tag}}"
         source: pull
 
-    - name: Restart Docker Container
+    - name: Touch config file
+      tags: config_template
+      ansible.builtin.file:
+        path: "{{ cointracker_config_path }}"
+        state: touch
+
+    - name: Template config file
+      tags: config_template
+      ansible.builtin.template:
+        src: config.yml.j2
+        dest: "{{ cointracker_config_path }}"
+
+    - name: Restart docker container
+      tags: docker_restart
       community.docker.docker_container:
         name: myapplication
-        image: "{{ image_name }}:{{ image_tag}}"
+        image: "{{ registry_url }}/{{ image_name }}:{{ image_tag}}"
         state: started
         restart: yes
+        volumes:
+          - /opt/cointracker:/etc/cointracker
         links:
           - "redis:redis"

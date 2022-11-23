@@ -1,0 +1,16 @@
+db:
+  host: {{ cointracker_redis_host }}
+  port: {{ cointracker_redis_port }}
+  db: {{ cointracker_redis_db }}
+  password: {{ cointracker_redis_password }}
+
+coinmarketcap:
+  api_key: {{ cointracker_coinmarketcap_api_key }}
+  sandbox: {% if cointracker_coinmarketcap_is_sandbox %}yes{% else %}no{% endif %}
+
+telegram:
+  api_key: {{ cointracker_telegram_api_key }}
+  users:
+{% for username in cointracker_telegram_users %}
+    - "{{ username }}"
+{% endfor %}
