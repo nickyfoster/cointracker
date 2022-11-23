@@ -3,10 +3,12 @@ pipeline {
         node {
             label 'ec2-fleet'
         }
-        environment {
-            ECR_URL = '381171443050.dkr.ecr.us-east-2.amazonaws.com'
-        }
     }
+
+    environment {
+        ECR_URL = '381171443050.dkr.ecr.us-east-2.amazonaws.com'
+    }
+
     stages {
         stage('Checkout project') {
             steps {
