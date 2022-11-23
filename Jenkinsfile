@@ -17,7 +17,7 @@ pipeline {
         stage('Build & Push Docker Image') {
             steps {
                 script {
-                    docker.withRegistry('381171443050.dkr.ecr.us-east-2.amazonaws.com', 'aws-ecr') {
+                    docker.withRegistry('https://381171443050.dkr.ecr.us-east-2.amazonaws.com', 'aws-ecr') {
                         sh "docker build . -t cointracker:${env.BUILD_NUMBER} -t cointracker:latest"
                         docker_image = docker.build("cointracker:${env.BUILD_NUMBER}")
                         docker_image.push()
