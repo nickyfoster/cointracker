@@ -6,7 +6,7 @@ pipeline {
     }
 
     environment {
-        ECR_URL = '381171443050.dkr.ecr.us-east-2.amazonaws.com'
+        ECR_URL = 'https://381171443050.dkr.ecr.us-east-2.amazonaws.com'
     }
 
     stages {
