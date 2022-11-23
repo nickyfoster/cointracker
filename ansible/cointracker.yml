@@ -1,0 +1,26 @@
+---
+- name: Ansible Test Playbook
+  gather_facts: false
+  hosts: tag_Name_infra_server
+  vars:
+    image_name: 381171443050.dkr.ecr.us-east-2.amazonaws.com/cointracker
+    image_tag: latest
+  tasks:
+    - name: Docker Login
+      community.docker.docker_login:
+        username: AWS
+        password: CHANGEME
+
+    - name: Pull Docker Image
+      community.docker.docker_image:
+        name: "{{ image_name }}:{{ image_tag}}"
+        source: pull
+
+    - name: Restart Docker Container
+      community.docker.docker_container:
+        name: myapplication
+        image: "{{ image_name }}:{{ image_tag}}"
+        state: started
+        restart: yes
+        links:
+          - "redis:redis"

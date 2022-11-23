@@ -2,6 +2,9 @@
 tracker/config-local.yml
 coins.yml
 
+# Ansible
+ansible/.vault_password_file
+
 # Created by https://www.gitignore.io/api/macos,linux,django,python,pycharm
 
 ### Django ###
