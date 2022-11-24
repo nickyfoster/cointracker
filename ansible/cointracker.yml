@@ -5,7 +5,7 @@
   vars:
     registry_url: 381171443050.dkr.ecr.us-east-2.amazonaws.com
     image_name: cointracker
-    image_tag: latest
+    image_tag: 27
   tasks:
     - name: Docker login
       tags: docker_login
