@@ -15,8 +15,8 @@ telegram:
 
 # Logging settings
 logging:
-  root_logging_level: INFO     # Root Logger logging level
-  file_logging_level: INFO     # File Logger logging level
-  console_logging_level: INFO  # Console Logger logging level
-  other_loggers_enabled: yes  # Enable other loggers, besides main logger
+  root_logging_level: INFO      # Root Logger logging level
+  file_logging_level: INFO      # File Logger logging level
+  console_logging_level: INFO   # Console Logger logging level
+  other_loggers_enabled: yes    # Enable other loggers, besides main logger
 
