@@ -30,8 +30,6 @@ pipeline {
                         sh "docker build . -t ${REPO_NAME}:${env.BUILD_NUMBER}"
                         docker_image = docker.build("${ECR_URL}/${REPO_NAME}:${env.BUILD_NUMBER}")
                         docker_image.push()
-                        println 11111
-                        println env.BRANCH_NAME
                         if (env.BRANCH_NAME == "master") {
                             docker_image.push("latest")
                         }
