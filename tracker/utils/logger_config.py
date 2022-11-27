@@ -1,12 +1,12 @@
 import multiprocessing
 import os
+from pathlib import Path
 
 from tracker.utils.utils import get_config, create_dir
 
 formatter = f'%(asctime)s %(levelname)s [%(module)s:%(lineno)d] %(message).2000s'
 
-dir_path = os.path.dirname(os.path.realpath(__file__))
-LOG_DIR = dir_path + '/logs/'
+LOG_DIR = Path(os.path.dirname(os.path.realpath(__file__))).parent.absolute() / "logs"
 create_dir(LOG_DIR)
 
 config = get_config().logging
@@ -42,4 +42,3 @@ LOG_CONFIG = {'version': 1,
                   'level': config.root_logging_level,
                   'handlers': ['console', 'file']}
               }
-

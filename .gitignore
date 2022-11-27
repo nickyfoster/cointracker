@@ -1,7 +1,7 @@
 # cointracker files
 tracker/config-local.yml
 coins.yml
-
+tracker/logs
 # Ansible
 ansible/.vault_password_file
 
