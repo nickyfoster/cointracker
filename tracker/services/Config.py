@@ -34,13 +34,24 @@ class CoinmarketcapApiConfig:
     api_key: str
     sandbox: bool
 
+
 @dataclass
 class TelegramConfig:
     api_key: str
     users: list
+
+
+@dataclass
+class LoggingConfig:
+    root_logging_level: str
+    file_logging_level: str
+    console_logging_level: str
+    other_loggers_enabled: bool
+
 
 @nested_dataclass
 class Config:
     db: DBConfig
     coinmarketcap: CoinmarketcapApiConfig
     telegram: TelegramConfig
+    logging: LoggingConfig

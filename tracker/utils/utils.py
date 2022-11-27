@@ -1,6 +1,11 @@
 import collections.abc
+import logging
+import os
+from datetime import datetime
 from json import JSONDecodeError
+from logging.handlers import RotatingFileHandler
 from pathlib import Path
+import socket
 
 import yaml
 
@@ -42,3 +47,30 @@ def get_config() -> Config:
 
 def get_db_connector(db_config=get_config().db):
     return RedisConnector(db_config)
+
+
+def get_hostname():
+    return socket.gethostname()
+
+
+def create_dir(path):
+    if not os.path.exists(path):
+        os.makedirs(path)
+
+
+class CustomRotatingFileHandler(RotatingFileHandler):
+    def doRollover(self):
+        super(CustomRotatingFileHandler, self).doRollover()
+        old_log = self.baseFilename + ".1"
+        with open(old_log, 'rb') as log:
+            now = datetime.now().strftime("%d-%m-%y-%H:%M:%S")
+            with gzip.open(self.baseFilename + now + '.gz', 'wb') as comp_log:
+                comp_log.writelines(log)
+        os.remove(old_log)
+
+
+def fix_all_loggers():
+    is_active = get_config().logging.other_loggers_enabled
+    for logger in logging.Logger.manager.loggerDict:
+        if logger != 'main' and not is_active:
+            logging.getLogger(logger).setLevel(logging.FATAL)
