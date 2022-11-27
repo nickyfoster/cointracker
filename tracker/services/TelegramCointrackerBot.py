@@ -232,10 +232,12 @@ class TelegramCointrackerBot:
 
     async def error_handler(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         query = update.callback_query
+        print(context.error.mesage())
         self.logger.error(msg="Exception while handling an update:", exc_info=context.error)
 
         await query.answer()
         await query.edit_message_text(text=f"An error occurred: {context.error}")
+        raise context.error
 
     def start_bot(self) -> None:
         config = get_config().telegram
@@ -264,7 +266,7 @@ class TelegramCointrackerBot:
         )
 
         application.add_handler(conv_handler)
-        application.add_error_handler(self.error_handler)
+        # application.add_error_handler(self.error_handler)
         application.run_polling()
 
 # TODO add filter

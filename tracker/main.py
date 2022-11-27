@@ -1,7 +1,7 @@
 import logging
 from logging.config import dictConfig
 
-from services.TelegramCointrackerBot import TelegramCointrackerBot
+from tracker.services.TelegramCointrackerBot import TelegramCointrackerBot
 from utils.logger_config import LOG_CONFIG
 from utils.utils import get_hostname, fix_all_loggers
 

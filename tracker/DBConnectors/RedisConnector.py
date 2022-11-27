@@ -1,3 +1,4 @@
+import logging
 from functools import partial
 from typing import Union, Callable, List
 
@@ -16,16 +17,13 @@ class RedisConnector(AbstractDBConnector):
     def __init__(self, config: DBConfig):
         self.config = config
         self.redis = self.init_redis()
+        self.logger = logging.getLogger("main")
 
     def init_redis(self):
-        try:
-            return Redis(host=self.config.host,
-                         port=self.config.port,
-                         db=self.config.db,
-                         password=self.config.password)
-
-        except Exception as e:
-            print(e)
+        return Redis(host=self.config.host,
+                     port=self.config.port,
+                     db=self.config.db,
+                     password=self.config.password)
 
     def set_redis(self):
         self.redis.close()
@@ -60,5 +58,8 @@ class RedisConnector(AbstractDBConnector):
         for key in keys:
             self.call(partial(self.delete_key, key))
 
+    def __list(self, keys_filter: str):
+        return [key.decode() for key in self.redis.scan_iter(keys_filter)]
+
     def list(self, keys_filter: str = '') -> list:
-        return [key.decode() for key in self.call(partial(self.redis.scan_iter, keys_filter))]
+        return self.call(partial(self.__list, keys_filter))
