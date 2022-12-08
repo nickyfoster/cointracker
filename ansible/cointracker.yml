@@ -38,8 +38,9 @@
         name: myapplication
         image: "{{ registry_url }}/{{ image_name }}:{{ image_tag}}"
         state: started
-        restart: yes
+        recreate: yes
         volumes:
           - /opt/cointracker:/etc/cointracker
+          - /var/log/cointracker:/application/tracker/logs
         links:
           - "redis:redis"

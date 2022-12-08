@@ -26,8 +26,6 @@ from tracker.services.Cointracker import Cointracker
 from tracker.services.Exception import CustomException
 from tracker.utils.utils import get_config
 
-DEVELOPER_CHAT_ID = None
-
 
 class TelegramCointrackerBot:
     def __init__(self):
