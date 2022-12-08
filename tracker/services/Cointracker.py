@@ -105,7 +105,8 @@ class Cointracker:
                 [coin_symbol.upper(), f"{data['price']}$ ({data['change_24h']}%)",
                  f"{data['holdings_price']}$ ({data['holdings_amount']})"])
 
-        coin_data_table = tabulate(coins,
+        sorted_coins = sorted(coins, key=lambda x: float(x[2].split("$")[0]))
+        coin_data_table = tabulate(sorted_coins,
                                    headers=['Name', 'Price (change %)', 'Holdings (amount)'])
         reply_text = f"{coin_data_table}\n\nLast updated: {last_updated}"
 
