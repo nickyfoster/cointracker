@@ -85,10 +85,10 @@ def prepare_coin_data(data: dict):
         price = coin_data["quote"]["USD"]["price"]
         holdings_price = holdings_amount * price
         res[coin_name] = {
-            "price": round(price, 5),
+            "price": round(price, 4),
             "holdings_amount": round(holdings_amount, 4),
             "holdings_price": round(holdings_price, 2),
-            "change_24h": round(coin_data["quote"]["USD"]["percent_change_24h"], 4)
+            "change_24h": round(coin_data["quote"]["USD"]["percent_change_24h"], 2)
         }
         last_updated += coin_data["last_updated"]
 
