@@ -87,7 +87,7 @@ def prepare_coin_data(data: dict):
         res[coin_name] = {
             "price": round(price, 5),
             "holdings_amount": round(holdings_amount, 4),
-            "holdings_price": round(holdings_price, 4),
+            "holdings_price": round(holdings_price, 2),
             "change_24h": round(coin_data["quote"]["USD"]["percent_change_24h"], 4)
         }
         last_updated += coin_data["last_updated"]

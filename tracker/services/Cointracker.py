@@ -102,8 +102,8 @@ class Cointracker:
             if coin_symbol == "last_updated":
                 continue
             coins.append(
-                [coin_symbol.upper(), f"{data['price']}, ({data['change_24h']})",
-                 f"{data['holdings_price']} ({data['holdings_amount']})"])
+                [coin_symbol.upper(), f"{data['price']}$ ({data['change_24h']})",
+                 f"{data['holdings_price']}$ ({data['holdings_amount']})"])
 
         coin_data_table = tabulate(coins,
                                    headers=['Name', 'Price (change %)', 'Holdings (amount)'])

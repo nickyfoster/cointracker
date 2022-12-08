@@ -1,8 +1,6 @@
 import logging
-from datetime import datetime
 
 from telegram import __version__ as TG_VER
-from telegram.constants import ParseMode
 from telegram.ext import filters, MessageHandler
 
 try:
@@ -53,7 +51,7 @@ class TelegramCointrackerBot:
             f"User {user.first_name} {user.last_name} ({user.username}|{user.id}) started the conversation.")
         keyboard = [
             [
-                InlineKeyboardButton("Get Portfolio", callback_data=self.GET_PORTFOLIO),
+                InlineKeyboardButton("Show Portfolio", callback_data=self.GET_PORTFOLIO),
                 InlineKeyboardButton("Update Portfolio", callback_data=self.UPDATE_PORTFOLIO)
             ]
         ]
@@ -66,7 +64,7 @@ class TelegramCointrackerBot:
         await query.answer()
         keyboard = [
             [
-                InlineKeyboardButton("Get Portfolio", callback_data=self.GET_PORTFOLIO),
+                InlineKeyboardButton("Show Portfolio", callback_data=self.GET_PORTFOLIO),
                 InlineKeyboardButton("Update Portfolio", callback_data=self.UPDATE_PORTFOLIO)
             ]
         ]
@@ -74,30 +72,12 @@ class TelegramCointrackerBot:
         return self.INLINE_BUTTON_ROUTES
 
     async def get_portfolio(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
-        """Show new choice of buttons"""
-        query = update.callback_query
-        await query.answer()
-        keyboard = [
-            [
-                InlineKeyboardButton("Portfolio Price", callback_data=self.PORTFOLIO_PRICE),
-                InlineKeyboardButton("Portfolio Description", callback_data=self.PORTFOLIO_DESCRIPTION),
-            ],
-            [
-                InlineKeyboardButton("Back", callback_data=self.START),
-            ]
-        ]
-        await query.edit_message_text(
-            text="Which description?", reply_markup=InlineKeyboardMarkup(keyboard)
-        )
-        return self.INLINE_BUTTON_ROUTES
-
-    async def get_portfolio_price(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
         query = update.callback_query
         await query.answer()
         keyboard = [
             [
                 InlineKeyboardButton("Yes", callback_data=self.PORTFOLIO_PRICE_UPDATE),
-                InlineKeyboardButton("Back", callback_data=self.GET_PORTFOLIO),
+                InlineKeyboardButton("Back", callback_data=self.START),
             ]
         ]
         if query.data == self.PORTFOLIO_PRICE_UPDATE:
@@ -106,8 +86,10 @@ class TelegramCointrackerBot:
         try:
             data = self.tracker.get_portfolio_price()
             portfolio_price = data["portfolio_price"]
-            last_updated = datetime.fromtimestamp(data["last_updated"]).strftime('%Y-%m-%d %H:%M:%S')
-            reply_text = f"Portfolio price: {portfolio_price:,} USD\nLast updated: {last_updated}"
+            portfolio_data = self.tracker.get_portfolio_description_str()
+
+            reply_text = "Portfolio price: {0:,} USD\n\n{1}".format(portfolio_price, portfolio_data)
+
         except CustomException as e:
             reply_text = f"An error occurred.\nMessage: {e}"
             self.logger.error(e)
@@ -115,31 +97,6 @@ class TelegramCointrackerBot:
         reply_text += "\n\nUpdate price?"
         await query.edit_message_text(
             text=reply_text, reply_markup=InlineKeyboardMarkup(keyboard)
-        )
-        return self.INLINE_BUTTON_ROUTES
-
-    async def get_portfolio_description(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
-        query = update.callback_query
-        await query.answer()
-        keyboard = [
-            [
-                InlineKeyboardButton("Yes", callback_data=self.PORTFOLIO_DESCRIPTION),
-                InlineKeyboardButton("Back", callback_data=self.GET_PORTFOLIO),
-            ]
-        ]
-        if query.data == self.PORTFOLIO_DESCRIPTION:
-            self.tracker.update_all_coins()
-
-        try:
-            reply_text = self.tracker.get_portfolio_description_str()
-
-        except CustomException as e:
-            reply_text = f"An error occurred.\nMessage: {e}"
-            self.logger.error(e)
-
-        reply_text += "\n\nUpdate data?"
-        await query.edit_message_text(
-            text=reply_text, reply_markup=InlineKeyboardMarkup(keyboard), parse_mode=ParseMode.HTML
         )
         return self.INLINE_BUTTON_ROUTES
 
@@ -234,16 +191,6 @@ class TelegramCointrackerBot:
         await query.edit_message_text(text="See ya!")
         return ConversationHandler.END
 
-    # async def error_handler(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    #     query = update.callback_query
-    #     print(context.error.mesage())
-    #     self.logger.error(msg="Exception while handling an update:", exc_info=context.error)
-    #
-    #     await query.answer()
-    #     print(context.error)
-    #     await query.edit_message_text(text=f"An error occurred: {context.error.message}")
-    #     raise context.error
-
     def start_bot(self) -> None:
         config = get_config().telegram
         application = Application.builder().token(config.api_key).build()
@@ -255,10 +202,8 @@ class TelegramCointrackerBot:
                     CallbackQueryHandler(self.get_portfolio, pattern="^" + self.GET_PORTFOLIO + "$"),
                     CallbackQueryHandler(self.update_portfolio, pattern="^" + self.UPDATE_PORTFOLIO + "$"),
                     CallbackQueryHandler(self.update_coin, pattern=f"^{self.UPDATE_PORTFOLIO}_[a-z]+$"),
-                    CallbackQueryHandler(self.get_portfolio_price,
+                    CallbackQueryHandler(self.get_portfolio,
                                          pattern=f"^{self.PORTFOLIO_PRICE}|{self.PORTFOLIO_PRICE_UPDATE}$"),
-                    CallbackQueryHandler(self.get_portfolio_description,
-                                         pattern="^" + self.PORTFOLIO_DESCRIPTION + "$"),
                     CallbackQueryHandler(self.set_coin_amount, pattern="^" + self.SET_COIN_AMOUNT + "$"),
                     CallbackQueryHandler(self.start_over, pattern="^" + self.START + "$"),
                     CallbackQueryHandler(self.end, pattern="^" + self.END + "$")
