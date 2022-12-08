@@ -1,8 +1,11 @@
 import json
 import time
+from datetime import datetime
+
+from tabulate import tabulate
 
 from tracker.services.CoinmarketcapAPI import CoinmarketcapAPI
-from tracker.utils.utils import get_db_connector, update_nested_dict
+from tracker.utils.utils import get_db_connector, update_nested_dict, prepare_coin_data
 
 
 class Cointracker:
@@ -74,3 +77,36 @@ class Cointracker:
         result["last_updated"] = last_update_time / len(portfolio_data)
         result["portfolio_price"] = round(portfolio_price, 2)
         return result
+
+    # def get_portfolio_description_str(self):
+    #     data = prepare_coin_data(self.get_portfolio_data())
+    #     coin_data_str = ""
+    #     last_updated = datetime.fromtimestamp(data["last_updated"]).strftime('%Y-%m-%d %H:%M:%S')
+    #
+    #     for coin_symbol, data in data.items():
+    #         if coin_symbol == "last_updated":
+    #             continue
+    #         coin_data_str += "{0:5} | {1} ({2} %) | {3}$ ({4})\n".format(
+    #             coin_symbol, data['price'], data['change_24h'], data['holdings_price'], data['holdings_amount'])
+    #     reply_text = f"COIN_NAME | PRICE | AMOUNT\n{coin_data_str}\nLast updated: {last_updated}"
+    #
+    #     return reply_text
+
+    def get_portfolio_description_str(self):
+
+        data = prepare_coin_data(self.get_portfolio_data())
+        last_updated = datetime.fromtimestamp(data["last_updated"]).strftime('%Y-%m-%d %H:%M:%S')
+
+        coins = []
+        for coin_symbol, data in data.items():
+            if coin_symbol == "last_updated":
+                continue
+            coins.append(
+                [coin_symbol.upper(), f"{data['price']}, ({data['change_24h']})",
+                 f"{data['holdings_price']} ({data['holdings_amount']})"])
+
+        coin_data_table = tabulate(coins,
+                                   headers=['Name', 'Price (change %)', 'Holdings (amount)'])
+        reply_text = f"{coin_data_table}\n\nLast updated: {last_updated}"
+
+        return reply_text

@@ -74,3 +74,23 @@ def fix_all_loggers():
     for logger in logging.Logger.manager.loggerDict:
         if logger != 'main' and not is_active:
             logging.getLogger(logger).setLevel(logging.FATAL)
+
+
+def prepare_coin_data(data: dict):
+    res = {}
+    n_coins = len(data)
+    last_updated = 0
+    for coin_name, coin_data in data.items():
+        holdings_amount = float(coin_data["amount"])
+        price = coin_data["quote"]["USD"]["price"]
+        holdings_price = holdings_amount * price
+        res[coin_name] = {
+            "price": round(price, 5),
+            "holdings_amount": round(holdings_amount, 4),
+            "holdings_price": round(holdings_price, 4),
+            "change_24h": round(coin_data["quote"]["USD"]["percent_change_24h"], 4)
+        }
+        last_updated += coin_data["last_updated"]
+
+    res["last_updated"] = last_updated / n_coins
+    return res

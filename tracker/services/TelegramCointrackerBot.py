@@ -2,6 +2,7 @@ import logging
 from datetime import datetime
 
 from telegram import __version__ as TG_VER
+from telegram.constants import ParseMode
 from telegram.ext import filters, MessageHandler
 
 try:
@@ -122,14 +123,23 @@ class TelegramCointrackerBot:
         await query.answer()
         keyboard = [
             [
-                InlineKeyboardButton("Return", callback_data=self.GET_PORTFOLIO),
-                InlineKeyboardButton("Close", callback_data=self.END),
+                InlineKeyboardButton("Yes", callback_data=self.PORTFOLIO_DESCRIPTION),
+                InlineKeyboardButton("Back", callback_data=self.GET_PORTFOLIO),
             ]
         ]
+        if query.data == self.PORTFOLIO_DESCRIPTION:
+            self.tracker.update_all_coins()
 
-        reply_text = "NOT IMPLEMENTED YET"
+        try:
+            reply_text = self.tracker.get_portfolio_description_str()
+
+        except CustomException as e:
+            reply_text = f"An error occurred.\nMessage: {e}"
+            self.logger.error(e)
+
+        reply_text += "\n\nUpdate data?"
         await query.edit_message_text(
-            text=reply_text, reply_markup=InlineKeyboardMarkup(keyboard)
+            text=reply_text, reply_markup=InlineKeyboardMarkup(keyboard), parse_mode=ParseMode.HTML
         )
         return self.INLINE_BUTTON_ROUTES
 

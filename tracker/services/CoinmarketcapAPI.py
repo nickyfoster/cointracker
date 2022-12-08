@@ -42,4 +42,4 @@ class CoinmarketcapAPI:
             data = json.loads(response.text)
             return data
         except (ConnectionError, Timeout, TooManyRedirects) as e:
-            print(e)
+            self.logger.error(e)
