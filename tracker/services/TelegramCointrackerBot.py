@@ -27,7 +27,6 @@ from tracker.services.Cointracker import Cointracker
 from tracker.services.Exception import CustomException
 from tracker.utils.utils import get_config
 
-
 DEVELOPER_CHAT_ID = None
 
 
@@ -58,8 +57,7 @@ class TelegramCointrackerBot:
             ]
         ]
 
-        reply_markup = InlineKeyboardMarkup(keyboard)
-        await update.message.reply_text("Please choose", reply_markup=reply_markup)
+        await update.message.reply_text("Please choose", reply_markup=InlineKeyboardMarkup(keyboard))
         return self.INLINE_BUTTON_ROUTES
 
     async def start_over(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
@@ -71,8 +69,7 @@ class TelegramCointrackerBot:
                 InlineKeyboardButton("Update Portfolio", callback_data=self.UPDATE_PORTFOLIO)
             ]
         ]
-        reply_markup = InlineKeyboardMarkup(keyboard)
-        await query.edit_message_text(text="Please choose", reply_markup=reply_markup)
+        await query.edit_message_text(text="Please choose", reply_markup=InlineKeyboardMarkup(keyboard))
         return self.INLINE_BUTTON_ROUTES
 
     async def get_portfolio(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
@@ -88,9 +85,8 @@ class TelegramCointrackerBot:
                 InlineKeyboardButton("Back", callback_data=self.START),
             ]
         ]
-        reply_markup = InlineKeyboardMarkup(keyboard)
         await query.edit_message_text(
-            text="Which description?", reply_markup=reply_markup
+            text="Which description?", reply_markup=InlineKeyboardMarkup(keyboard)
         )
         return self.INLINE_BUTTON_ROUTES
 
@@ -103,15 +99,13 @@ class TelegramCointrackerBot:
                 InlineKeyboardButton("Back", callback_data=self.GET_PORTFOLIO),
             ]
         ]
-        reply_markup = InlineKeyboardMarkup(keyboard)
-
         if query.data == self.PORTFOLIO_PRICE_UPDATE:
             self.tracker.update_all_coins()
 
         try:
             data = self.tracker.get_portfolio_price()
             portfolio_price = data["portfolio_price"]
-            last_updated = datetime.fromtimestamp(data["last_updated"])
+            last_updated = datetime.fromtimestamp(data["last_updated"]).strftime('%Y-%m-%d %H:%M:%S')
             reply_text = f"Portfolio price: {portfolio_price:,} USD\nLast updated: {last_updated}"
         except CustomException as e:
             reply_text = f"An error occurred.\nMessage: {e}"
@@ -119,7 +113,7 @@ class TelegramCointrackerBot:
 
         reply_text += "\n\nUpdate price?"
         await query.edit_message_text(
-            text=reply_text, reply_markup=reply_markup
+            text=reply_text, reply_markup=InlineKeyboardMarkup(keyboard)
         )
         return self.INLINE_BUTTON_ROUTES
 
@@ -132,11 +126,10 @@ class TelegramCointrackerBot:
                 InlineKeyboardButton("Close", callback_data=self.END),
             ]
         ]
-        reply_markup = InlineKeyboardMarkup(keyboard)
 
         reply_text = "NOT IMPLEMENTED YET"
         await query.edit_message_text(
-            text=reply_text, reply_markup=reply_markup
+            text=reply_text, reply_markup=InlineKeyboardMarkup(keyboard)
         )
         return self.INLINE_BUTTON_ROUTES
 
@@ -153,11 +146,9 @@ class TelegramCointrackerBot:
                                      callback_data=f"{self.UPDATE_PORTFOLIO}_{coin_symbol.lower()}"))
             cnt += 1
 
-        reply_markup = InlineKeyboardMarkup(keyboard)
-
         reply_text = "\n\nChoose coin"
         await query.edit_message_text(
-            text=reply_text, reply_markup=reply_markup
+            text=reply_text, reply_markup=InlineKeyboardMarkup(keyboard)
         )
         return self.INLINE_BUTTON_ROUTES
 
@@ -180,23 +171,28 @@ class TelegramCointrackerBot:
         """Save input for feature and return to feature selection."""
         user_data = context.user_data
         coin_symbol = user_data["coin_symbol"]
+
         try:
             coin_amount = float(update.message.text)
-        except Exception as e:
-            raise e
-
-        user_data["coin_amount"] = float(coin_amount)
-
-        keyboard = [
-            [
-                InlineKeyboardButton("Yes", callback_data=self.SET_COIN_AMOUNT),
-                InlineKeyboardButton("No", callback_data=self.UPDATE_PORTFOLIO),
+            if coin_amount < 0:
+                raise ValueError
+            reply_text = f"Setting {coin_symbol.upper()} -> {coin_amount}"
+            keyboard = [
+                [
+                    InlineKeyboardButton("Yes", callback_data=self.SET_COIN_AMOUNT),
+                    InlineKeyboardButton("No", callback_data=self.UPDATE_PORTFOLIO),
+                ]
             ]
-        ]
-        reply_markup = InlineKeyboardMarkup(keyboard)
-
-        reply_text = f"Setting {coin_symbol.upper()} -> {coin_amount}"
-        await update.message.reply_text(text=reply_text, reply_markup=reply_markup)
+        except ValueError as e:
+            reply_text = "Unable to set this amount, retry"
+            coin_amount = -1
+            keyboard = [
+                [
+                    InlineKeyboardButton("Retry", callback_data=self.UPDATE_PORTFOLIO)
+                ]
+            ]
+        user_data["coin_amount"] = float(coin_amount)
+        await update.message.reply_text(text=reply_text, reply_markup=InlineKeyboardMarkup(keyboard))
 
         return self.INLINE_BUTTON_ROUTES
 
@@ -218,9 +214,7 @@ class TelegramCointrackerBot:
             ]
         ]
 
-        reply_markup = InlineKeyboardMarkup(keyboard)
-
-        await query.edit_message_text(text=reply_text, reply_markup=reply_markup)
+        await query.edit_message_text(text=reply_text, reply_markup=InlineKeyboardMarkup(keyboard))
 
         return self.INLINE_BUTTON_ROUTES
 
@@ -230,14 +224,15 @@ class TelegramCointrackerBot:
         await query.edit_message_text(text="See ya!")
         return ConversationHandler.END
 
-    async def error_handler(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-        query = update.callback_query
-        print(context.error.mesage())
-        self.logger.error(msg="Exception while handling an update:", exc_info=context.error)
-
-        await query.answer()
-        await query.edit_message_text(text=f"An error occurred: {context.error}")
-        raise context.error
+    # async def error_handler(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    #     query = update.callback_query
+    #     print(context.error.mesage())
+    #     self.logger.error(msg="Exception while handling an update:", exc_info=context.error)
+    #
+    #     await query.answer()
+    #     print(context.error)
+    #     await query.edit_message_text(text=f"An error occurred: {context.error.message}")
+    #     raise context.error
 
     def start_bot(self) -> None:
         config = get_config().telegram

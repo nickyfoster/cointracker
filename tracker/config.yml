@@ -4,6 +4,7 @@ db:
   db: 0
   password:
 
+
 coinmarketcap:
   api_key: THISISASECRET
   sandbox: no
@@ -20,3 +21,8 @@ logging:
   console_logging_level: INFO   # Console Logger logging level
   other_loggers_enabled: yes    # Enable other loggers, besides main logger
 
+# Preload data
+preload_data:
+  do_preload: no                # Do preload data
+  data:                         # Preload data in format = coin_name:coin_amount
+    btc: 1000

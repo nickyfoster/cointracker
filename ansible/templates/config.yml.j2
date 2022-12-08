@@ -14,3 +14,9 @@ telegram:
 {% for username in cointracker_telegram_users %}
     - "{{ username }}"
 {% endfor %}
+
+preload_data:
+  do_preload: {% if cointracker_do_preload_coin_data %}yes{% else %}no{% endif %}
+
+  data:
+    {{ cointracker_preload_coin_data }}

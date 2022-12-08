@@ -1,11 +1,11 @@
 import collections.abc
 import logging
 import os
+import socket
 from datetime import datetime
 from json import JSONDecodeError
 from logging.handlers import RotatingFileHandler
 from pathlib import Path
-import socket
 
 import yaml
 

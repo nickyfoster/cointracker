@@ -49,9 +49,16 @@ class LoggingConfig:
     other_loggers_enabled: bool
 
 
+@dataclass
+class PreloadData:
+    do_preload: bool
+    data: dict
+
+
 @nested_dataclass
 class Config:
     db: DBConfig
     coinmarketcap: CoinmarketcapApiConfig
     telegram: TelegramConfig
     logging: LoggingConfig
+    preload_data: PreloadData
