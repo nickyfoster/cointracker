@@ -35,7 +35,8 @@ setup(
         "python-telegram-bot==20.0a4",
         "PyYAML==6.0",
         "redis==4.3.4",
-        "requests==2.28.1"
+        "requests==2.28.1",
+        "tabulate==0.9.0",
     ],
     cmdclass={
         'develop': PostDevelopCommand,

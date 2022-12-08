@@ -6,7 +6,7 @@
     registry_url: 381171443050.dkr.ecr.us-east-2.amazonaws.com
     registry_region: us-east-2
     image_name: cointracker
-    image_tag: 33
+    image_tag: 4
   tasks:
     - name: AWS ECR get Docker token and login
       shell: |
