@@ -37,6 +37,7 @@ setup(
         "redis==4.3.4",
         "requests==2.28.1",
         "tabulate==0.9.0",
+        "SQLAlchemy~=1.4.45",
     ],
     cmdclass={
         'develop': PostDevelopCommand,
