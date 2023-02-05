@@ -6,6 +6,7 @@ tracker/logs
 ansible/.vault_password_file
 
 # Created by https://www.gitignore.io/api/macos,linux,django,python,pycharm
+.idea/*
 
 ### Django ###
 *.log
