@@ -21,3 +21,5 @@ cd ansible
 ansible-playbook cointracker.yml
 ```
 
+
+# TODO make one IAM user
