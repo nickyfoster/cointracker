@@ -19,5 +19,4 @@ if config.preload_data.do_preload:
         tracker.add_coin(coin, amount)
 
 bot = TelegramCointrackerBot()
-
 bot.start_bot()

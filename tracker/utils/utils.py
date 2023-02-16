@@ -2,6 +2,7 @@ import collections.abc
 import logging
 import os
 import socket
+import threading
 from datetime import datetime
 from json import JSONDecodeError
 from logging.handlers import RotatingFileHandler
@@ -11,6 +12,12 @@ import yaml
 
 from tracker.DBConnectors.RedisConnector import RedisConnector
 from tracker.services.Config import Config
+
+
+def run_thread(process, daemon=True):
+    thread = threading.Thread(target=process, args=())
+    thread.daemon = daemon
+    thread.start()
 
 
 def load_yml(file):
