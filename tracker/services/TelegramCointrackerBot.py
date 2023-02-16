@@ -1,4 +1,5 @@
 import logging
+import time
 
 from telegram import __version__ as TG_VER
 from telegram.ext import filters, MessageHandler
@@ -189,6 +190,18 @@ class TelegramCointrackerBot:
         await query.edit_message_text(text="See ya!")
         return ConversationHandler.END
 
+    @staticmethod
+    def readiness_probe():
+        with open("/tmp/readiness-probe", "w") as f:
+            f.write(str("ready"))
+
+    @staticmethod
+    def run_liveness_probe():
+        while True:
+            with open("/tmp/liveness-probe", "w") as f:
+                f.write(str(int(time.time())))
+            time.sleep(5)
+
     def start_bot(self) -> None:
         config = get_config().telegram
         application = Application.builder().token(config.api_key).build()
@@ -215,6 +228,8 @@ class TelegramCointrackerBot:
 
         application.add_handler(conv_handler)
         # application.add_error_handler(self.error_handler)
+        self.readiness_probe()
+        self.run_liveness_probe()
         application.run_polling()
 
 # TODO add filter
