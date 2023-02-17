@@ -191,11 +191,6 @@ class TelegramCointrackerBot:
         return ConversationHandler.END
 
     @staticmethod
-    def readiness_probe():
-        with open("/tmp/readiness-probe", "w") as f:
-            f.write(str("ready"))
-
-    @staticmethod
     def run_liveness_probe():
         while True:
             with open("/tmp/liveness-probe", "w") as f:
@@ -228,7 +223,6 @@ class TelegramCointrackerBot:
 
         application.add_handler(conv_handler)
         # application.add_error_handler(self.error_handler)
-        self.readiness_probe()
         run_thread(self.run_liveness_probe)
         self.logger.info("Starting cointracker bot")
         application.run_polling()

@@ -1,4 +1,5 @@
 import collections.abc
+import gzip
 import logging
 import os
 import socket

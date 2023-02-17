@@ -9,7 +9,7 @@ from utils.utils import get_hostname, fix_all_loggers, get_config
 logger = logging.getLogger('main')
 
 dictConfig(LOG_CONFIG)
-fix_all_loggers()
+# fix_all_loggers()
 
 logger.info(f"Initializing cointracker bot on {get_hostname()}")
 config = get_config()
