@@ -25,7 +25,7 @@ from telegram.ext import (
 )
 from tracker.services.Cointracker import Cointracker
 from tracker.services.Exception import CustomException
-from tracker.utils.utils import get_config
+from tracker.utils.utils import get_config, run_thread
 
 
 class TelegramCointrackerBot:
@@ -229,7 +229,8 @@ class TelegramCointrackerBot:
         application.add_handler(conv_handler)
         # application.add_error_handler(self.error_handler)
         self.readiness_probe()
-        self.run_liveness_probe()
+        run_thread(self.run_liveness_probe)
+        self.logger.info("Starting cointracker bot")
         application.run_polling()
 
 # TODO add filter
