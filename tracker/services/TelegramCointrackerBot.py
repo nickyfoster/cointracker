@@ -4,6 +4,9 @@ import time
 from telegram import __version__ as TG_VER
 from telegram.ext import filters, MessageHandler
 
+from tracker.services.ExceptionCode import ExceptionCode
+from tracker.services.ExceptionMessage import ExceptionMessage
+
 try:
     from telegram import __version_info__
 except ImportError:
@@ -43,9 +46,14 @@ class TelegramCointrackerBot:
 
         self.logger = logging.getLogger(__name__)
         self.tracker = Cointracker()
+        self.config = get_config()
 
     async def start(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
         user = update.message.from_user
+        self.tracker.db.set_user_prefix(user.id)
+        if self.config.db.migrate:
+            self.tracker.db.migrate()
+
         self.logger.info(
             f"User {user.first_name} {user.last_name} ({user.username}|{user.id}) started the conversation.")
         keyboard = [
@@ -84,16 +92,25 @@ class TelegramCointrackerBot:
 
         try:
             data = self.tracker.get_portfolio_price()
+            if not data:
+                raise CustomException(code=ExceptionCode.INTERNAL_SERVER_ERROR,
+                                      message=ExceptionMessage.COINTRACKER_DATA_PORTFOLIO_DATA_EMPTY)
+
             portfolio_price = data["portfolio_price"]
             portfolio_data = self.tracker.get_portfolio_description_str()
 
             reply_text = "Portfolio price: {0:,} USD\n\n{1}".format(portfolio_price, portfolio_data)
+            reply_text += "\n\nUpdate price?"
 
         except CustomException as e:
             reply_text = f"An error occurred.\nMessage: {e}"
+            keyboard = [
+                [
+                    InlineKeyboardButton("Back", callback_data=self.START)
+                ]
+            ]
             self.logger.error(e)
 
-        reply_text += "\n\nUpdate price?"
         await query.edit_message_text(
             text=reply_text, reply_markup=InlineKeyboardMarkup(keyboard)
         )
@@ -102,17 +119,31 @@ class TelegramCointrackerBot:
     async def update_portfolio(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
         query = update.callback_query
         await query.answer()
-        coins = self.tracker.list_coins()
-        keyboard = [[], [], [], [InlineKeyboardButton("Back", callback_data=self.START)]]
-        cnt = 0
-        for coin in coins:
-            coin_symbol = str(coin)
-            keyboard[cnt % 3].append(
-                InlineKeyboardButton(coin_symbol.upper(),
-                                     callback_data=f"{self.UPDATE_PORTFOLIO}_{coin_symbol.lower()}"))
-            cnt += 1
+        try:
+            coins = self.tracker.list_coins()
+            if not coins:
+                raise CustomException(code=ExceptionCode.INTERNAL_SERVER_ERROR,
+                                      message=ExceptionMessage.COINTRACKER_DATA_PORTFOLIO_DATA_EMPTY)
+            keyboard = [[], [], [], [InlineKeyboardButton("Back", callback_data=self.START)]]
+            cnt = 0
+            for coin in coins:
+                coin_symbol = str(coin)
+                keyboard[cnt % 3].append(
+                    InlineKeyboardButton(coin_symbol.upper(),
+                                         callback_data=f"{self.UPDATE_PORTFOLIO}_{coin_symbol.lower()}"))
+                cnt += 1
 
-        reply_text = "\n\nChoose coin"
+            reply_text = "\n\nChoose coin"
+
+        except CustomException as e:
+            reply_text = f"An error occurred.\nMessage: {e}"
+            keyboard = [
+                [
+                    InlineKeyboardButton("Back", callback_data=self.START)
+                ]
+            ]
+            self.logger.error(e)
+
         await query.edit_message_text(
             text=reply_text, reply_markup=InlineKeyboardMarkup(keyboard)
         )
@@ -198,7 +229,7 @@ class TelegramCointrackerBot:
             time.sleep(5)
 
     def start_bot(self) -> None:
-        config = get_config().telegram
+        config = self.config.telegram
         application = Application.builder().token(config.api_key).build()
 
         conv_handler = ConversationHandler(

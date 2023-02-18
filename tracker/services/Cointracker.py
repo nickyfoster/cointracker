@@ -15,12 +15,11 @@ class Cointracker:
 
     def set_coin_data(self, coin_symbol: str, data: dict):
         data["last_updated"] = time.time()
-        self.db.set(f"coin/{coin_symbol.lower()}", json.dumps(data))
+        self.db.set(key=coin_symbol, data=json.dumps(data))
 
     def get_coin_data(self, coin_symbol: str):
-        coin_key = f"coin/{coin_symbol.lower()}"
-        if self.db.exists(coin_key):
-            return json.loads(self.db.get(coin_key))
+        if self.db.exists(coin_symbol):
+            return json.loads(self.db.get(coin_symbol))
         else:
             return dict()
 
@@ -44,10 +43,10 @@ class Cointracker:
         self.update_coins_data([coin_symbol])
 
     def delete_coin(self, coin_symbol):
-        self.db.delete_key(f"coin/{coin_symbol.lower()}")
+        self.db.delete_key(coin_symbol)
 
     def list_coins(self):
-        coins = self.db.list("coin/*")
+        coins = self.db.list_coin_keys()
         res = list()
         for coin in coins:
             res.append(coin.split('coin/')[1])
@@ -70,6 +69,9 @@ class Cointracker:
         result = dict()
         portfolio_price = 0
         last_update_time = 0
+
+        if not portfolio_data:
+            return None
 
         for coin_symbol, coin_data in portfolio_data.items():
             last_update_time += float(coin_data["last_updated"])
