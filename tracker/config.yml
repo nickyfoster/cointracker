@@ -3,6 +3,7 @@ db:
   port: 6379
   db: 0
   password:
+  migrate: no
 
 
 coinmarketcap:

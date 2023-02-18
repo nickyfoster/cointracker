@@ -27,6 +27,7 @@ class DBConfig:
     port: int
     db: int
     password: str
+    migrate: bool
 
 
 @dataclass
