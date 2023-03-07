@@ -41,10 +41,13 @@ async def telegram_client():
     """
     Connect to bot
     """
-    load_dotenv()
-    api_id = int(os.environ.get("TELEGRAM_APP_ID"))
-    api_hash = os.environ.get("TELEGRAM_APP_HASH")
-    session_str = os.environ.get("TELEGRAM_APP_SESSION")
+    load_dotenv()  # For local tests
+    try:
+        api_id = int(os.environ.get("TELEGRAM_APP_ID"))
+        api_hash = os.environ.get("TELEGRAM_APP_HASH")
+        session_str = os.environ.get("TELEGRAM_APP_SESSION")
+    except TypeError:
+        raise TypeError(".env file or environmental variables not found.")
 
     client = TelegramClient(
         StringSession(session_str), api_id, api_hash, sequential_updates=True
