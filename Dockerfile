@@ -4,7 +4,7 @@ WORKDIR "/application"
 ENV PYTHONPATH=/application
 
 COPY setup.py setup.py
-COPY tracker ./tracker
+COPY cointracker ./tracker
 
 RUN pip --version && pip install . --no-cache-dir
 

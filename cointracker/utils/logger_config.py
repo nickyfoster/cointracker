@@ -2,7 +2,7 @@ import multiprocessing
 import os
 from pathlib import Path
 
-from tracker.utils.utils import get_config, create_dir
+from cointracker.utils.utils import get_config, create_dir
 
 formatter = f'%(asctime)s %(levelname)s [%(module)s:%(lineno)d] %(message).2000s'
 
@@ -26,7 +26,7 @@ LOG_CONFIG = {'version': 1,
                       'formatter': 'default',
                       'stream': 'ext://sys.stdout'},
                   'file': {
-                      'class': 'tracker.utils.utils.CustomRotatingFileHandler',
+                      'class': 'cointracker.utils.utils.CustomRotatingFileHandler',
                       'level': config.file_logging_level,
                       'formatter': 'default',
                       'filename': os.path.join(LOG_DIR, 'app.main.log'),
@@ -34,7 +34,7 @@ LOG_CONFIG = {'version': 1,
                       'maxBytes': 5000000,
                       'backupCount': 5},
                   'queue_listener': {
-                      'class': 'tracker.services.QueueListenerHandler.QueueListenerHandler',
+                      'class': 'cointracker.services.QueueListenerHandler.QueueListenerHandler',
                       'handlers': ['cfg://handlers.file'],
                       'queue': 'cfg://objects.queue'}
               },

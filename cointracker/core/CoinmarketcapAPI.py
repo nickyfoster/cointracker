@@ -4,7 +4,7 @@ import logging
 from requests import Session
 from requests.exceptions import ConnectionError, Timeout, TooManyRedirects
 
-from tracker.utils.utils import get_config
+from cointracker.utils.utils import get_config
 
 
 class CoinmarketcapAPI:

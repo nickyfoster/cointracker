@@ -1,15 +1,19 @@
 import asyncio
 import os
-import time
+import random
+import string
 
+import fakeredis
 import pytest
 import pytest_asyncio
 from dotenv import load_dotenv
 from telethon import TelegramClient
 from telethon.sessions import StringSession
 from telethon.tl.custom.conversation import Conversation
+from cointracker.core.TelegramCointrackerBot import TelegramCointrackerBot
 
-from tracker.services.TelegramCointrackerBot import TelegramCointrackerBot
+random_string = ''.join(random.choice(string.ascii_lowercase) for i in range(10))
+START_COMMAND = f"/{random_string}"
 
 
 @pytest.fixture(autouse=True, scope="session")
@@ -24,7 +28,8 @@ def bot(event_loop: asyncio.events.AbstractEventLoop):
     """
     Run bot for testing
     """
-    bot = TelegramCointrackerBot()
+    bot = TelegramCointrackerBot(start_command_string=START_COMMAND[1:])
+    bot.tracker.db.redis = fakeredis.FakeStrictRedis(version=6)
     stop_event = asyncio.Event()
     event_loop.create_task(bot.run_bot(stop_event=stop_event))
     yield
@@ -36,10 +41,13 @@ async def telegram_client():
     """
     Connect to bot
     """
-    load_dotenv()
-    api_id = int(os.environ.get("TELEGRAM_APP_ID"))
-    api_hash = os.environ.get("TELEGRAM_APP_HASH")
-    session_str = os.environ.get("TELEGRAM_APP_SESSION")
+    load_dotenv()  # For local tests
+    try:
+        api_id = int(os.environ.get("TELEGRAM_APP_ID"))
+        api_hash = os.environ.get("TELEGRAM_APP_HASH")
+        session_str = os.environ.get("TELEGRAM_APP_SESSION")
+    except TypeError:
+        raise TypeError(".env file or environmental variables not found.")
 
     client = TelegramClient(
         StringSession(session_str), api_id, api_hash, sequential_updates=True

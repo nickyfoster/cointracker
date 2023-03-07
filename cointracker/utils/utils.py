@@ -11,8 +11,8 @@ from pathlib import Path
 
 import yaml
 
-from tracker.DBConnectors.RedisConnector import RedisConnector
-from tracker.services.Config import Config
+from cointracker.DBConnectors.RedisConnector import RedisConnector
+from cointracker.services.Config import Config
 
 
 def run_thread(process, daemon=True):
@@ -29,7 +29,7 @@ def load_yml(file):
             if d is None:
                 d = dict()
     except (FileNotFoundError, JSONDecodeError):
-        d = dict()
+        d = {}
     return d
 
 

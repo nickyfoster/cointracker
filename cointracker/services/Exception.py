@@ -1,5 +1,5 @@
-from tracker.services.ExceptionCode import ExceptionCode
-from tracker.services.ExceptionMessage import ExceptionMessage
+from cointracker.services.ExceptionCode import ExceptionCode
+from cointracker.services.ExceptionMessage import ExceptionMessage
 
 
 class CustomException(Exception):

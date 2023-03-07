@@ -5,11 +5,11 @@ from datetime import datetime
 
 from tabulate import tabulate
 
-from tracker.services.CoinmarketcapAPI import CoinmarketcapAPI
-from tracker.services.Exception import CustomException
-from tracker.services.ExceptionCode import ExceptionCode
-from tracker.services.ExceptionMessage import ExceptionMessage
-from tracker.utils.utils import get_db_connector, update_nested_dict, prepare_coin_data
+from cointracker.core.CoinmarketcapAPI import CoinmarketcapAPI
+from cointracker.services.Exception import CustomException
+from cointracker.services.ExceptionCode import ExceptionCode
+from cointracker.services.ExceptionMessage import ExceptionMessage
+from cointracker.utils.utils import get_db_connector, update_nested_dict, prepare_coin_data
 
 
 class Cointracker:

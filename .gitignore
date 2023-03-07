@@ -1,8 +1,8 @@
 # cointracker files
-tracker/config-local.yml
+cointracker/config-local.yml
 test/e2e/config-local.yml
 coins.yml
-tracker/logs
+cointracker/logs
 
 
 # Ansible

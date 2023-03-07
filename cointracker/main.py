@@ -2,8 +2,8 @@ import asyncio
 import logging
 from logging.config import dictConfig
 
-from tracker.services.Cointracker import Cointracker
-from tracker.services.TelegramCointrackerBot import TelegramCointrackerBot
+from cointracker.core.Cointracker import Cointracker
+from cointracker.core.TelegramCointrackerBot import TelegramCointrackerBot
 from utils.logger_config import LOG_CONFIG
 from utils.utils import get_hostname, get_config
 
@@ -28,6 +28,7 @@ async def main():
         await asyncio.create_task(bot.run_bot(stop_event=stop_event))
     except KeyboardInterrupt:
         stop_event.set()
+        # TODO exit gracefully
 
 
 if __name__ == '__main__':
