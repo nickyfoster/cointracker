@@ -1,6 +1,6 @@
-from setuptools import find_packages
 import os
 
+from setuptools import find_packages
 from setuptools import setup
 from setuptools.command.develop import develop
 from setuptools.command.install import install
@@ -38,6 +38,10 @@ setup(
         "requests==2.28.1",
         "tabulate==0.9.0",
         "SQLAlchemy~=1.4.45",
+        "Telethon==1.27.0",
+        "pytest==7.2.2",
+        "pytest-asyncio==0.20.3",
+        "python-dotenv==1.0.0",
     ],
     cmdclass={
         'develop': PostDevelopCommand,
