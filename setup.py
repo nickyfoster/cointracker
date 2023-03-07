@@ -37,11 +37,11 @@ setup(
         "redis==4.3.4",
         "requests==2.28.1",
         "tabulate==0.9.0",
-        "SQLAlchemy~=1.4.45",
         "Telethon==1.27.0",
         "pytest==7.2.2",
         "pytest-asyncio==0.20.3",
         "python-dotenv==1.0.0",
+        "fakeredis==2.10.0",
     ],
     cmdclass={
         'develop': PostDevelopCommand,

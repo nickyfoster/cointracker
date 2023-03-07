@@ -44,7 +44,7 @@ class RedisConnector(AbstractDBConnector):
     def close(self) -> None:
         self.call(self.redis.close)
 
-    def get_full_key(self, keyname):
+    def get_full_key(self, keyname: str) -> str:
         return f"{self.user_prefix}/{self.coin_prefix}/{keyname.lower()}"
 
     def set(self, key: str, data: Union) -> None:

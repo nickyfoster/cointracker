@@ -34,24 +34,24 @@ from tracker.utils.utils import get_config, run_thread
 
 
 class TelegramCointrackerBot:
-    def __init__(self):
-        self.start_command_string = "start"
-        self.is_running = True
-        self.START = "start"
-        self.END = "end"
-        self.GET_PORTFOLIO = "get_portfolio"
-        self.UPDATE_PORTFOLIO = "update_portfolio"
-        self.UPDATE_MENU = "update_menu"
-        self.ADD_COIN = "add_coin"
-        self.PORTFOLIO_PRICE = "portfolio_price"
-        self.PORTFOLIO_PRICE_UPDATE = "portfolio_price_update"
-        self.PORTFOLIO_DESCRIPTION = "portfolio_description"
-        self.SET_COIN_AMOUNT = "set_coin_amount"
-        self.INLINE_BUTTON_ROUTES = "inline_button_routes"
-        self.USER_INPUT_ROUTES = "user_input_routes"
-        self.COIN_ACTION_UPDATE = "coin_action_update"
-        self.COIN_ACTION_ADD = "coin_action_add"
+    START = "start"
+    END = "end"
+    GET_PORTFOLIO = "get_portfolio"
+    UPDATE_PORTFOLIO = "update_portfolio"
+    UPDATE_MENU = "update_menu"
+    ADD_COIN = "add_coin"
+    PORTFOLIO_PRICE = "portfolio_price"
+    PORTFOLIO_PRICE_UPDATE = "portfolio_price_update"
+    PORTFOLIO_DESCRIPTION = "portfolio_description"
+    SET_COIN_AMOUNT = "set_coin_amount"
+    INLINE_BUTTON_ROUTES = "inline_button_routes"
+    USER_INPUT_ROUTES = "user_input_routes"
+    COIN_ACTION_UPDATE = "coin_action_update"
+    COIN_ACTION_ADD = "coin_action_add"
 
+    def __init__(self, db_class: str = None, start_command_string: str = None):
+        self.start_command_string = "start" if not start_command_string else start_command_string
+        self.db_class = "Redis" if db_class is not None else db_class
         self.logger = logging.getLogger(__name__)
         self.tracker = Cointracker()
         self.config = get_config()
@@ -112,7 +112,7 @@ class TelegramCointrackerBot:
         query = update.callback_query
         await query.answer()
         keyboard = self.get_keyboard(
-            [{"Add new coin": self.ADD_COIN, "Update portfolio": self.UPDATE_PORTFOLIO}, {"Back": self.START}])
+            [{"Add coin": self.ADD_COIN, "Update coin": self.UPDATE_PORTFOLIO}, {"Back": self.START}])
         await query.edit_message_text(text="Please choose", reply_markup=InlineKeyboardMarkup(keyboard))
         return self.INLINE_BUTTON_ROUTES
 
@@ -170,9 +170,16 @@ class TelegramCointrackerBot:
             user_data["coin_action"] = self.COIN_ACTION_UPDATE
             user_data["coin_amount"] = float(coin_amount)
         elif prompt_type == self.COIN_ACTION_ADD:
+            try:
+                # Validating user input
+                coin_symbol = update.message.text.split(" ")[0]
+                coin_amount = update.message.text.split(" ")[1]
+            except IndexError:
+                # TODO rewrite this bs
+                coin_symbol = coin_amount = -1
             keyboard, reply_text, coin_amount, coin_symbol = self.get_portfolio_update_metadata(
-                coin_symbol=update.message.text.split(" ")[0],
-                coin_amount=update.message.text.split(" ")[1])
+                coin_symbol=coin_symbol,
+                coin_amount=coin_amount)
             user_data["coin_action"] = self.COIN_ACTION_ADD
             user_data["coin_symbol"] = coin_symbol
             user_data["coin_amount"] = float(coin_amount)
@@ -201,9 +208,10 @@ class TelegramCointrackerBot:
         return ConversationHandler.END
 
     def get_portfolio_update_metadata(self, coin_symbol, coin_amount):
+        # TODO add to unit test
         try:
             coin_amount = float(coin_amount)
-            if coin_amount < 0:
+            if coin_amount < 0 or not coin_symbol.isalnum():
                 raise ValueError
             reply_text = f"Adding {coin_symbol.upper()} -> {coin_amount}"
             keyboard = self.get_keyboard([{"Yes": self.SET_COIN_AMOUNT, "No": self.UPDATE_PORTFOLIO}])

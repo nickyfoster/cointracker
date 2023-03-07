@@ -1,14 +1,19 @@
 import asyncio
 import os
+import random
+import string
 
+import fakeredis
 import pytest
 import pytest_asyncio
 from dotenv import load_dotenv
 from telethon import TelegramClient
 from telethon.sessions import StringSession
 from telethon.tl.custom.conversation import Conversation
-
 from tracker.core.TelegramCointrackerBot import TelegramCointrackerBot
+
+random_string = ''.join(random.choice(string.ascii_lowercase) for i in range(10))
+START_COMMAND = f"/{random_string}"
 
 
 @pytest.fixture(autouse=True, scope="session")
@@ -23,7 +28,8 @@ def bot(event_loop: asyncio.events.AbstractEventLoop):
     """
     Run bot for testing
     """
-    bot = TelegramCointrackerBot()
+    bot = TelegramCointrackerBot(start_command_string=START_COMMAND[1:])
+    bot.tracker.db.redis = fakeredis.FakeStrictRedis(version=6)
     stop_event = asyncio.Event()
     event_loop.create_task(bot.run_bot(stop_event=stop_event))
     yield

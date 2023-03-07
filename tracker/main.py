@@ -28,6 +28,7 @@ async def main():
         await asyncio.create_task(bot.run_bot(stop_event=stop_event))
     except KeyboardInterrupt:
         stop_event.set()
+        # TODO exit gracefully
 
 
 if __name__ == '__main__':
