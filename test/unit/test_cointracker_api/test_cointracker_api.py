@@ -1,6 +1,6 @@
 import unittest
 
-from tracker.services.Cointracker import Cointracker
+from tracker.core.Cointracker import Cointracker
 from tracker.services.Exception import CustomException
 
 

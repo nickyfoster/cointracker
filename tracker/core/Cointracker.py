@@ -5,7 +5,7 @@ from datetime import datetime
 
 from tabulate import tabulate
 
-from tracker.services.CoinmarketcapAPI import CoinmarketcapAPI
+from tracker.core.CoinmarketcapAPI import CoinmarketcapAPI
 from tracker.services.Exception import CustomException
 from tracker.services.ExceptionCode import ExceptionCode
 from tracker.services.ExceptionMessage import ExceptionMessage

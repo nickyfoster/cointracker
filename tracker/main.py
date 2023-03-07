@@ -2,8 +2,8 @@ import asyncio
 import logging
 from logging.config import dictConfig
 
-from tracker.services.Cointracker import Cointracker
-from tracker.services.TelegramCointrackerBot import TelegramCointrackerBot
+from tracker.core.Cointracker import Cointracker
+from tracker.core.TelegramCointrackerBot import TelegramCointrackerBot
 from utils.logger_config import LOG_CONFIG
 from utils.utils import get_hostname, get_config
 

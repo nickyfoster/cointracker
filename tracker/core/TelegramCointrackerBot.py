@@ -28,7 +28,7 @@ from telegram.ext import (
     ContextTypes,
     ConversationHandler,
 )
-from tracker.services.Cointracker import Cointracker
+from tracker.core.Cointracker import Cointracker
 from tracker.services.Exception import CustomException
 from tracker.utils.utils import get_config, run_thread
 

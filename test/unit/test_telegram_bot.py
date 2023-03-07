@@ -3,9 +3,9 @@ import unittest
 
 from telegram import InlineKeyboardButton
 
-from tracker.services.Cointracker import Cointracker
+from tracker.core.Cointracker import Cointracker
 from tracker.services.Exception import CustomException
-from tracker.services.TelegramCointrackerBot import TelegramCointrackerBot
+from tracker.core.TelegramCointrackerBot import TelegramCointrackerBot
 from unit.env import RESOURCES
 
 

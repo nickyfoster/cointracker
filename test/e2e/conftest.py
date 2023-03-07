@@ -1,6 +1,5 @@
 import asyncio
 import os
-import time
 
 import pytest
 import pytest_asyncio
@@ -9,7 +8,7 @@ from telethon import TelegramClient
 from telethon.sessions import StringSession
 from telethon.tl.custom.conversation import Conversation
 
-from tracker.services.TelegramCointrackerBot import TelegramCointrackerBot
+from tracker.core.TelegramCointrackerBot import TelegramCointrackerBot
 
 
 @pytest.fixture(autouse=True, scope="session")
