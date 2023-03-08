@@ -5,11 +5,11 @@ from typing import Union, Callable, List
 from redis import Redis
 from redis.exceptions import ConnectionError, ResponseError
 
-from tracker.DBConnectors.AbstractDBConnector import AbstractDBConnector
-from tracker.services.Config import DBConfig
-from tracker.services.Exception import CustomException
-from tracker.services.ExceptionCode import ExceptionCode
-from tracker.services.ExceptionMessage import ExceptionMessage
+from cointracker.DBConnectors.AbstractDBConnector import AbstractDBConnector
+from cointracker.services.Config import DBConfig
+from cointracker.services.Exception import CustomException
+from cointracker.services.ExceptionCode import ExceptionCode
+from cointracker.services.ExceptionMessage import ExceptionMessage
 
 
 class RedisConnector(AbstractDBConnector):

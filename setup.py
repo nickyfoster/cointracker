@@ -28,9 +28,9 @@ setup(
     name='cointracker',
     url='https://github.com/nickyfoster/cointracker.git',
     description='Cointracker',
-    keywords='tracker crypto portfolio',
+    keywords='cointracker crypto portfolio',
     packages=find_packages(exclude=['test', 'test.*']),
-    package_dir={'tracker': 'tracker'},
+    package_dir={'cointracker': 'cointracker'},
     install_requires=[
         "python-telegram-bot==20.0a4",
         "PyYAML==6.0",

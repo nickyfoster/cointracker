@@ -6,8 +6,8 @@ from typing import Optional
 from telegram import __version__ as TG_VER
 from telegram.ext import filters, MessageHandler
 
-from tracker.services.ExceptionCode import ExceptionCode
-from tracker.services.ExceptionMessage import ExceptionMessage
+from cointracker.services.ExceptionCode import ExceptionCode
+from cointracker.services.ExceptionMessage import ExceptionMessage
 
 try:
     from telegram import __version_info__
@@ -28,9 +28,9 @@ from telegram.ext import (
     ContextTypes,
     ConversationHandler,
 )
-from tracker.core.Cointracker import Cointracker
-from tracker.services.Exception import CustomException
-from tracker.utils.utils import get_config, run_thread
+from cointracker.core.Cointracker import Cointracker
+from cointracker.services.Exception import CustomException
+from cointracker.utils.utils import get_config, run_thread
 
 
 class TelegramCointrackerBot:
@@ -49,9 +49,9 @@ class TelegramCointrackerBot:
     COIN_ACTION_UPDATE = "coin_action_update"
     COIN_ACTION_ADD = "coin_action_add"
 
-    def __init__(self, db_class: str = None, start_command_string: str = None):
-        self.start_command_string = "start" if not start_command_string else start_command_string
-        self.db_class = "Redis" if db_class is not None else db_class
+    def __init__(self, db_class: str = "Redis", start_command_string: str = "start"):
+        self.start_command_string = start_command_string
+        self.db_class = db_class
         self.logger = logging.getLogger(__name__)
         self.tracker = Cointracker()
         self.config = get_config()

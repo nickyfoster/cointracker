@@ -10,7 +10,7 @@ from dotenv import load_dotenv
 from telethon import TelegramClient
 from telethon.sessions import StringSession
 from telethon.tl.custom.conversation import Conversation
-from tracker.core.TelegramCointrackerBot import TelegramCointrackerBot
+from cointracker.core.TelegramCointrackerBot import TelegramCointrackerBot
 
 random_string = ''.join(random.choice(string.ascii_lowercase) for i in range(10))
 START_COMMAND = f"/{random_string}"
