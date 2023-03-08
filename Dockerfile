@@ -3,6 +3,7 @@ FROM python:3.9-slim
 WORKDIR "/application"
 ENV PYTHONPATH=/application
 
+COPY pyproject.toml pyproject.toml
 COPY requirements.txt requirements.txt
 COPY cointracker ./tracker
 
