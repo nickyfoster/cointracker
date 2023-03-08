@@ -1,29 +1,35 @@
+### Redis DB connection parameters
 db:
-  host: localhost
-  port: 6379
-  db: 0
-  password:
-  migrate: no
+  host: localhost             # Redis DB host
+  port: 6379                  # Redis DB port
+  db: 0                       # Redis DB number
+  password:                   # Redis DB password
+  migrate: no                 # DB migration during bot initialization. No need to use it for version >= v0.0.2
+  use_fakeredis: no           # Use in-memory RedisDB insted of real Redis service.
+                              #   Use for development purposes only! Otherwise, risk of loosing all persistent data.
 
 
+### CoinmarketcapPRO API parameters
 coinmarketcap:
-  api_key: THISISASECRET
-  sandbox: no
+  api_key: THISISASECRET        # API key
+  sandbox: no                   # Mode 'sandbox' flag. In 'sandbox' mode, API requests are not affecting usage limits.
 
+
+### TelegramBot API parameters
 telegram:
-  api_key: THISISASECRET
-  users:
-    - thisisausername
+  api_key: THISISASECRET        # API key
 
-# Logging settings
+
+### Logging parameters
 logging:
   root_logging_level: INFO      # Root Logger logging level
   file_logging_level: INFO      # File Logger logging level
   console_logging_level: INFO   # Console Logger logging level
   other_loggers_enabled: yes    # Enable other loggers, besides main logger
 
-# Preload data
+
+### Bot pre-start parameters
 preload_data:
-  do_preload: no                # Do preload data
-  data:                         # Preload data in format = coin_name:coin_amount
+  do_preload: no                # Flag
+  data:                         # Data to preload during bot start
     btc: 1000

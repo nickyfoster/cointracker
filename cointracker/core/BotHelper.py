@@ -17,11 +17,9 @@ class BotHelper(BotHelperReplyMarkups):
         super().__init__()
         self.tracker = Cointracker()
         self.logger = logging.getLogger(__name__)
-        # self.helper_reply_markups = BotHelperReplyMarkups()
 
     def get_portfolio(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         query = update.callback_query
-        # TODO add logging for user
         self.tracker.db.set_user_prefix(update.callback_query.from_user.id)
         keyboard = self.get_keyboard([{"Yes": PORTFOLIO_PRICE_UPDATE, "Back": START}])
         if query.data == PORTFOLIO_PRICE_UPDATE:

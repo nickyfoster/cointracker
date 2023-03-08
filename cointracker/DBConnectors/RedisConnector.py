@@ -2,6 +2,7 @@ import logging
 from functools import partial
 from typing import Union, Callable, List
 
+import fakeredis
 from redis import Redis
 from redis.exceptions import ConnectionError, ResponseError
 
@@ -22,10 +23,14 @@ class RedisConnector(AbstractDBConnector):
         self.coin_prefix = "coin"
 
     def init_redis(self):
-        return Redis(host=self.config.host,
-                     port=self.config.port,
-                     db=self.config.db,
-                     password=self.config.password)
+        if self.config.use_fakeredis:
+            return fakeredis.FakeStrictRedis(version=6)
+        else:
+
+            return Redis(host=self.config.host,
+                         port=self.config.port,
+                         db=self.config.db,
+                         password=self.config.password)
 
     def set_redis(self):
         self.redis.close()

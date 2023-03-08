@@ -32,7 +32,7 @@ from telegram.ext import (
     ConversationHandler,
 )
 from cointracker.core.Cointracker import Cointracker
-from cointracker.utils.utils import get_config, run_thread, get_api_key
+from cointracker.utils.utils import run_thread, get_api_key, get_user_obj_from_update
 
 
 class TelegramCointrackerBot:
@@ -43,44 +43,50 @@ class TelegramCointrackerBot:
         self.helper = BotHelper()
         self.tracker = Cointracker()
         self.reply_markups = BotHelperReplyMarkups()
-        self.config = get_config()
-        self.application = self.init_bot(self.config.telegram)
+        self.application = self.init_bot()
 
-    def init_bot(self, config):
+    def init_bot(self):
         api_key = get_api_key(api_name="Telegram")
         self.logger.debug("Building bot backend...")
         application = Application.builder().token(api_key).build()
         application.add_handler(self.get_conv_handler())
+        self.logger.debug("Done building bot backend!")
         return application
 
     async def start(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
-        user = update.message.from_user  # TODO add dataclass for user meta
+        user = get_user_obj_from_update(update)
         self.logger.info(
             f"User {user.first_name} {user.last_name} ({user.username}|{user.id}) started the conversation.")
         await update.message.reply_text("Please choose", reply_markup=self.helper.get_start_reply_markup())
         return INLINE_BUTTON_ROUTES
 
     async def start_over(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
-        self.logger.debug(f"User: TODO add user in strart_over path")  # TODO add user meta getter
+        user = get_user_obj_from_update(update)
+        self.logger.debug(f"User: {user.full_name} in /start_over")
         await update.callback_query.answer()
         await update.callback_query.edit_message_text(text="Please choose",
                                                       reply_markup=self.helper.get_start_reply_markup())
         return INLINE_BUTTON_ROUTES
 
     async def get_portfolio(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
+        user = get_user_obj_from_update(update)
+        self.logger.debug(f"User: {user.full_name} in /get_portfolio")
         await update.callback_query.answer()
         reply_text, reply_markup = self.helper.get_portfolio(update, context)
         await update.callback_query.edit_message_text(text=reply_text, reply_markup=reply_markup)
         return INLINE_BUTTON_ROUTES
 
     async def update_menu(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        user = get_user_obj_from_update(update)
+        self.logger.debug(f"User: {user.full_name} in /update_menu")
         query = update.callback_query
         await query.answer()
-        # TODO(big) make dataclass with paths, reply markups and texts
         await query.edit_message_text(text="Please choose", reply_markup=self.helper.get_update_menu_reply_markup())
         return INLINE_BUTTON_ROUTES
 
     async def add_coin(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
+        user = get_user_obj_from_update(update)
+        self.logger.debug(f"User: {user.full_name} in /add_coin")
         self.helper.add_coin(update, context)
         await update.callback_query.answer()
         await update.callback_query.edit_message_text(
@@ -88,12 +94,16 @@ class TelegramCointrackerBot:
         return USER_INPUT_ROUTES
 
     async def update_portfolio(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
+        user = get_user_obj_from_update(update)
+        self.logger.debug(f"User: {user.full_name} in /update_portfolio")
         await update.callback_query.answer()
         reply_text, reply_markup = self.helper.update_portfolio(update, context)
         await update.callback_query.edit_message_text(text=reply_text, reply_markup=reply_markup)
         return INLINE_BUTTON_ROUTES
 
     async def update_coin(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
+        user = get_user_obj_from_update(update)
+        self.logger.debug(f"User: {user.full_name} in /update_coin")
         await update.callback_query.answer()
         coin_data = self.helper.update_coin(update, context)
         await update.callback_query.answer()
@@ -102,17 +112,23 @@ class TelegramCointrackerBot:
         return USER_INPUT_ROUTES
 
     async def process_user_prompt(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
+        user = get_user_obj_from_update(update)
+        self.logger.debug(f"User: {user.full_name} in /process_user_prompt")
         reply_text, reply_markup = self.helper.process_user_prompt(update, context)
         await update.message.reply_text(text=reply_text, reply_markup=reply_markup)
         return INLINE_BUTTON_ROUTES
 
     async def set_coin_amount(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        user = get_user_obj_from_update(update)
+        self.logger.debug(f"User: {user.full_name} in /set_coin_amount")
         await update.callback_query.answer()
         reply_text, reply_markup = self.helper.set_coin_amount(update, context)
         await update.callback_query.edit_message_text(text=reply_text, reply_markup=reply_markup)
         return INLINE_BUTTON_ROUTES
 
     async def end(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+        user = get_user_obj_from_update(update)
+        self.logger.debug(f"User: {user.full_name} in /end")
         query = update.callback_query
         await query.answer()
         await query.edit_message_text(text="See ya!")
@@ -156,6 +172,5 @@ class TelegramCointrackerBot:
             await self.application.updater.start_polling()
             self.logger.info("Started cointracker bot")
             await stop_event.wait()
-
             await self.application.updater.stop()
             await self.application.stop()
