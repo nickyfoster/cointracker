@@ -4,8 +4,8 @@ from logging.config import dictConfig
 
 from cointracker.core.Cointracker import Cointracker
 from cointracker.core.TelegramCointrackerBot import TelegramCointrackerBot
-from utils.logger_config import LOG_CONFIG
-from utils.utils import get_hostname, get_config
+from cointracker.utils.logger_config import LOG_CONFIG
+from cointracker.utils.utils import get_hostname, get_config
 
 logger = logging.getLogger('main')
 
