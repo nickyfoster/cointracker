@@ -14,6 +14,8 @@ import yaml
 from cointracker.DBConnectors.RedisConnector import RedisConnector
 from cointracker.services.Config import Config
 
+logger = logging.getLogger(__name__)
+
 
 def run_thread(process, daemon=True):
     thread = threading.Thread(target=process, args=())
@@ -40,6 +42,21 @@ def update_nested_dict(d, u):
         else:
             d[k] = v
     return d
+
+
+def get_api_key(api_name: str) -> str:
+    config = get_config()
+    logger.debug(f"Looking for {api_name} API key")
+    if api_name == "Telegram":
+        api_key = os.environ.get("TELEGRAM_BOT_API_KEY")
+        if not api_key:
+            logger.debug(f"No ENV var for {api_name} API key found.\nGetting from config")
+            api_key = config.telegram.api_key
+        else:
+            logger.debug(f"Found {api_name} API key from env.")
+            return api_key
+    elif api_name == "Coinmarketcap":
+        pass
 
 
 def get_config() -> Config:

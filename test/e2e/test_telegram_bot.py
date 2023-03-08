@@ -117,6 +117,8 @@ async def test_009_update_coin(conv: Conversation):
     wait()
     reply: Message = await conv.get_edit()
     assert reply.text == f"{coin_name} -> {float(coin_update_amount)} updated!"
+    # TODO check that amount in portfolio has changed
+    # reply: Message = await go_to_show_portfolio_menu(conv)
 
 
 @pytest.mark.asyncio
