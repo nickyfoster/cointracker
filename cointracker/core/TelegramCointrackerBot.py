@@ -31,7 +31,6 @@ from telegram.ext import (
     ContextTypes,
     ConversationHandler,
 )
-from cointracker.core.Cointracker import Cointracker
 from cointracker.utils.utils import run_thread, get_api_key, get_user_obj_from_update
 
 
@@ -41,7 +40,6 @@ class TelegramCointrackerBot:
         self.start_command_string = start_command_string
         self.logger = logging.getLogger(__name__)
         self.helper = BotHelper()
-        self.tracker = Cointracker()
         self.reply_markups = BotHelperReplyMarkups()
         self.application = self.init_bot()
 
