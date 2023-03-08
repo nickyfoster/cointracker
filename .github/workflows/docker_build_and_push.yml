@@ -1,9 +1,9 @@
-name: CI
+name: Docker Build & Push
 
 on:
   push:
     branches:
-      - 'master'
+      - master
 
 env:
   AWS_REGION: us-east-2
@@ -12,7 +12,6 @@ env:
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout
         uses: actions/checkout@v3

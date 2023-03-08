@@ -8,7 +8,7 @@ A simple Telegram bot made with python for tracking your precious cryptocurrenci
 Edit config file and install cointracker python packege with setuptools.
 
 ```bash
-vi tracker/config.yml
+vi cointracker/config.yml
 python3 setup.py
 ```
     

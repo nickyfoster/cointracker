@@ -1,17 +1,22 @@
 import json
+import logging
 import time
 from datetime import datetime
 
 from tabulate import tabulate
 
-from tracker.services.CoinmarketcapAPI import CoinmarketcapAPI
-from tracker.utils.utils import get_db_connector, update_nested_dict, prepare_coin_data
+from cointracker.core.CoinmarketcapAPI import CoinmarketcapAPI
+from cointracker.services.Exception import CustomException
+from cointracker.services.ExceptionCode import ExceptionCode
+from cointracker.services.ExceptionMessage import ExceptionMessage
+from cointracker.utils.utils import get_db_connector, update_nested_dict, prepare_coin_data
 
 
 class Cointracker:
     def __init__(self):
         self.db = get_db_connector()
         self.api = CoinmarketcapAPI()
+        self.logger = logging.getLogger(__name__)
 
     def set_coin_data(self, coin_symbol: str, data: dict):
         data["last_updated"] = time.time()
@@ -25,6 +30,9 @@ class Cointracker:
 
     def update_coins_data(self, coins: list):
         api_data = self.api.get_currency_quotes_latest(coins)
+        if api_data["status"]["error_code"] != 0:
+            raise CustomException(code=ExceptionCode.INTERNAL_SERVER_ERROR,
+                                  message=ExceptionMessage.COINTRACKER_DATA_PORTFOLIO_DATA_INVALID)
         for _coin_symbol in coins:
             current_data = self.get_coin_data(_coin_symbol)
             res_data = update_nested_dict(current_data, api_data['data'][_coin_symbol.upper()][0])
@@ -75,24 +83,14 @@ class Cointracker:
 
         for coin_symbol, coin_data in portfolio_data.items():
             last_update_time += float(coin_data["last_updated"])
-            portfolio_price += float(coin_data['quote']['USD']['price']) * float(coin_data['amount'])
+            try:
+                portfolio_price += float(coin_data['quote']['USD']['price']) * float(coin_data['amount'])
+            except KeyError:
+                self.logger.error(f"Invalid coin detected: {coin_symbol.upper()}. Removing from portfolio.")
+                self.delete_coin(coin_symbol)
         result["last_updated"] = last_update_time / len(portfolio_data)
         result["portfolio_price"] = round(portfolio_price, 2)
         return result
-
-    # def get_portfolio_description_str(self):
-    #     data = prepare_coin_data(self.get_portfolio_data())
-    #     coin_data_str = ""
-    #     last_updated = datetime.fromtimestamp(data["last_updated"]).strftime('%Y-%m-%d %H:%M:%S')
-    #
-    #     for coin_symbol, data in data.items():
-    #         if coin_symbol == "last_updated":
-    #             continue
-    #         coin_data_str += "{0:5} | {1} ({2} %) | {3}$ ({4})\n".format(
-    #             coin_symbol, data['price'], data['change_24h'], data['holdings_price'], data['holdings_amount'])
-    #     reply_text = f"COIN_NAME | PRICE | AMOUNT\n{coin_data_str}\nLast updated: {last_updated}"
-    #
-    #     return reply_text
 
     def get_portfolio_description_str(self):
 

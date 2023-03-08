@@ -1,10 +1,11 @@
 import json
 import logging
+import os
 
 from requests import Session
 from requests.exceptions import ConnectionError, Timeout, TooManyRedirects
 
-from tracker.utils.utils import get_config
+from cointracker.utils.utils import get_config
 
 
 class CoinmarketcapAPI:
@@ -17,9 +18,12 @@ class CoinmarketcapAPI:
         self.session = self.ini_connection()
 
     def ini_connection(self):
+        api_key = os.environ.get("COINMARKETCAP_API_KEY")
+        if not api_key:
+            api_key = self.api_key
         headers = {
             'Accepts': 'application/json',
-            'X-CMC_PRO_API_KEY': self.api_key,
+            'X-CMC_PRO_API_KEY': api_key,
         }
         session = Session()
         session.headers.update(headers)
