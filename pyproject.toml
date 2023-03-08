@@ -21,6 +21,9 @@ build-backend = "setuptools.build_meta"
 [tool.setuptools.packages.find]
 include = ["cointracker*"]
 
+[tool.setuptools.package-data]
+"*" = ["*.yml"]
+
 [tool.setuptools.dynamic]
 dependencies = {file = ["requirements.txt"]}
 
