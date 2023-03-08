@@ -30,7 +30,7 @@ class TestTelegramBotAPI(unittest.TestCase):
                 assert type(button["text"]) == str
 
     def test_001_keyboard_generation(self):
-        keyboard_layout = json.load(open(TestTelegramBotAPI.KEYBOARD_DATA))
+        keyboard_layout = json.load(open(TestTelegramBotAPI.KEYBOARD_DATA, encoding="UTF-8"))
         bot = TelegramCointrackerBot()
 
         keyboard = bot.get_keyboard(keyboard_layout=keyboard_layout)

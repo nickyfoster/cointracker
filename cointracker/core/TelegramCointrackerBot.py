@@ -1,4 +1,5 @@
 import logging
+import os
 import time
 from asyncio import Event
 from typing import Optional
@@ -58,7 +59,10 @@ class TelegramCointrackerBot:
         self.application = self.init_bot(self.config.telegram)
 
     def init_bot(self, config):
-        application = Application.builder().token(config.api_key).build()
+        api_key = os.environ.get("TELEGRAM_BOT_API_KEY")
+        if not api_key:
+            api_key = config.api_key
+        application = Application.builder().token(api_key).build()
         application.add_handler(self.get_conv_handler())
 
         return application
