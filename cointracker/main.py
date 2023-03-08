@@ -8,21 +8,25 @@ from cointracker.utils.logger_config import LOG_CONFIG
 from cointracker.utils.utils import get_hostname, get_config
 
 logger = logging.getLogger('main')
-
 dictConfig(LOG_CONFIG)
-# fix_all_loggers()
-
 logger.info(f"Initializing cointracker bot on {get_hostname()}")
 
 config = get_config()
+# Preload initial portfolio data from config
 if config.preload_data.do_preload:
     tracker = Cointracker()
     for coin, amount in config.preload_data.data.items():
         tracker.add_coin(coin, amount)
+    del tracker
 
 
 async def main():
     bot = TelegramCointrackerBot()
+
+    # Database migration
+    # if config.db.migrate:
+    #     bot.tracker.db.migrate()
+
     stop_event = asyncio.Event()
     try:
         await asyncio.create_task(bot.run_bot(stop_event=stop_event))

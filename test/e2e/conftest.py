@@ -29,7 +29,7 @@ def bot(event_loop: asyncio.events.AbstractEventLoop):
     Run bot for testing
     """
     bot = TelegramCointrackerBot(start_command_string=START_COMMAND[1:])
-    bot.tracker.db.redis = fakeredis.FakeStrictRedis(version=6)
+    bot.helper.tracker.db.redis = fakeredis.FakeStrictRedis(version=6)
     stop_event = asyncio.Event()
     event_loop.create_task(bot.run_bot(stop_event=stop_event))
     yield

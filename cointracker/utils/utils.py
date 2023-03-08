@@ -10,9 +10,12 @@ from logging.handlers import RotatingFileHandler
 from pathlib import Path
 
 import yaml
+from telegram import Update, User
 
 from cointracker.DBConnectors.RedisConnector import RedisConnector
 from cointracker.services.Config import Config
+
+logger = logging.getLogger(__name__)
 
 
 def run_thread(process, daemon=True):
@@ -40,6 +43,31 @@ def update_nested_dict(d, u):
         else:
             d[k] = v
     return d
+
+
+def get_api_key(api_name: str) -> str:
+    config = get_config()
+    logger.debug(f"Looking for {api_name} API key")
+
+    # api_key = os.environ.get(f"{api_name.upper()}_API_KEY")
+    # if not api_key:
+    #     logger.debug(f"No ENV var for {api_name} API key found.\nGetting from config")
+    #     api_key = config.api.api_key
+    # logger.debug(f"Found {api_name} API key from env.") # TODO use string for accessing object vars
+    # return api_key
+    if api_name == "Telegram":
+        api_key = os.environ.get("TELEGRAM_BOT_API_KEY")
+        if not api_key:
+            logger.debug(f"No ENV var for {api_name} API key found.\nGetting from config")
+            api_key = config.telegram.api_key
+        logger.debug(f"Found {api_name} API key from env.")
+    elif api_name == "Coinmarketcap":
+        api_key = os.environ.get("COINMARKETCAP_API_KEY")
+        if not api_key:
+            logger.debug(f"No ENV var for {api_name} API key found.\nGetting from config")
+            api_key = config.coinmarketcap.api_key
+        logger.debug(f"Found {api_name} API key from env.")
+    return api_key
 
 
 def get_config() -> Config:
@@ -102,3 +130,10 @@ def prepare_coin_data(data: dict):
 
     res["last_updated"] = last_updated / n_coins
     return res
+
+
+def get_user_obj_from_update(update: Update) -> User:
+    try:
+        return update.message.from_user
+    except AttributeError:
+        return update.callback_query.from_user

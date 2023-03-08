@@ -28,6 +28,7 @@ class DBConfig:
     db: int
     password: str
     migrate: bool
+    use_fakeredis: bool
 
 
 @dataclass
@@ -39,7 +40,6 @@ class CoinmarketcapApiConfig:
 @dataclass
 class TelegramConfig:
     api_key: str
-    users: list
 
 
 @dataclass

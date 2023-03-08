@@ -18,7 +18,7 @@ class TestTelegramBotAPI(unittest.TestCase):
         coins = data["coins"]
         n_rows = data["n_rows"]
         bot = TelegramCointrackerBot()
-        keyboard = bot.get_coins_keyboard(coins=coins, n_rows=n_rows)
+        keyboard = bot.helper.get_coins_keyboard(coins=coins, n_rows=n_rows)
         assert len(keyboard[:-1]) == n_rows
         self.assertIsInstance(keyboard[-1][0], InlineKeyboardButton)
         assert type(keyboard) == list
@@ -33,7 +33,7 @@ class TestTelegramBotAPI(unittest.TestCase):
         keyboard_layout = json.load(open(TestTelegramBotAPI.KEYBOARD_DATA, encoding="UTF-8"))
         bot = TelegramCointrackerBot()
 
-        keyboard = bot.get_keyboard(keyboard_layout=keyboard_layout)
+        keyboard = bot.helper.get_keyboard(keyboard_layout=keyboard_layout)
         assert len(keyboard) == len(keyboard_layout)
 
     def test_001_invalid_coin_data(self):

@@ -4,7 +4,7 @@ from telethon.tl.custom.message import Message
 
 from e2e.conftest import START_COMMAND
 from e2e.helpers import get_buttons, wait, go_to_add_coin_menu, go_to_show_portfolio_menu, go_to_update_portfolio_menu, \
-    get_timestamp_from_portfolio_description_string, go_to_update_coin_menu
+    get_timestamp_from_portfolio_description_string, go_to_update_coin_menu, get_coin_amount_from_show_portfolio_menu
 
 test_data = {
     "coin_name": "BTC",
@@ -117,7 +117,8 @@ async def test_009_update_coin(conv: Conversation):
     wait()
     reply: Message = await conv.get_edit()
     assert reply.text == f"{coin_name} -> {float(coin_update_amount)} updated!"
-
+    reply: Message = await go_to_show_portfolio_menu(conv)
+    assert str(float(coin_update_amount)) == get_coin_amount_from_show_portfolio_menu(reply.text)
 
 @pytest.mark.asyncio
 async def test_010_update_coin_with_invalid_data(conv: Conversation):
