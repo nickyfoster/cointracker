@@ -5,7 +5,7 @@ ENV PYTHONPATH=/application
 
 COPY pyproject.toml pyproject.toml
 COPY requirements.txt requirements.txt
-COPY cointracker ./tracker
+COPY cointracker cointracker
 
 RUN pip --version && pip install . --no-cache-dir
 
