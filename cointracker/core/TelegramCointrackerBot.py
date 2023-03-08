@@ -198,7 +198,7 @@ class TelegramCointrackerBot:
         coin_symbol, coin_amount, action = user_data["coin_symbol"], user_data["coin_amount"], user_data["coin_action"]
         if action == self.COIN_ACTION_ADD:
             self.tracker.add_coin(coin_symbol, coin_amount)
-        elif action == self.COIN_ACTION_ADD:
+        elif action == self.COIN_ACTION_UPDATE:
             self.tracker.update_coin_amount(coin_symbol, coin_amount)
         reply_text = f"{coin_symbol.upper()} -> {coin_amount} updated!"
         keyboard = self.get_keyboard([{"Back": self.UPDATE_MENU, "Exit": self.END}])
