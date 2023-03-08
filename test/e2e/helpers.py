@@ -94,3 +94,11 @@ def get_timestamp_from_portfolio_description_string(portfolio_description_str: s
                                  '%Y-%m-%d %H:%M:%S')
     except AttributeError:
         return None
+
+
+def get_coin_amount_from_show_portfolio_menu(portfolio_str: str) -> float:
+    try:
+        found = re.search("\((\d+\.\d+)\)", portfolio_str)
+        return portfolio_str[found.start() + 1:found.end() - 1]  # removing parentheses
+    except AttributeError:
+        return None
