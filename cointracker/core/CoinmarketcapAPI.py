@@ -40,7 +40,6 @@ class CoinmarketcapAPI:
 
     def __get(self, endpoint, parameters):
         url = self.url + endpoint
-
         try:
             self.logger.debug(f"Making request to {url}")
             response = self.session.get(url, params=parameters)
