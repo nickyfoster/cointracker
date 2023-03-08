@@ -17,9 +17,12 @@ class CoinmarketcapAPI:
         self.session = self.ini_connection()
 
     def ini_connection(self):
+        api_key = os.environ.get("COINMARKETCAP_API_KEY")
+        if not api_key:
+            api_key = self.api_key
         headers = {
             'Accepts': 'application/json',
-            'X-CMC_PRO_API_KEY': self.api_key,
+            'X-CMC_PRO_API_KEY': api_key,
         }
         session = Session()
         session.headers.update(headers)
