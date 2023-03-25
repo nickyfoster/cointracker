@@ -15,7 +15,7 @@ from telegram import Update, User
 from cointracker.DBConnectors.RedisConnector import RedisConnector
 from cointracker.services.Config import Config
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('main')
 
 
 def run_thread(process, daemon=True):

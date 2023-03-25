@@ -4,6 +4,7 @@ from logging.config import dictConfig
 
 from cointracker.core.Cointracker import Cointracker
 from cointracker.core.TelegramCointrackerBot import TelegramCointrackerBot
+from cointracker.services.PrometheusClient import PrometheusClient
 from cointracker.utils.logger_config import LOG_CONFIG
 from cointracker.utils.utils import get_hostname, get_config
 
@@ -22,10 +23,8 @@ if config.preload_data.do_preload:
 
 async def main():
     bot = TelegramCointrackerBot()
-
-    # Database migration
-    # if config.db.migrate:
-    #     bot.tracker.db.migrate()
+    prometheus = PrometheusClient()
+    prometheus.run_server()
 
     stop_event = asyncio.Event()
     try:

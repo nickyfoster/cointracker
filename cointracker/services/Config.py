@@ -43,6 +43,11 @@ class TelegramConfig:
 
 
 @dataclass
+class Prometheus:
+    port: int
+
+
+@dataclass
 class LoggingConfig:
     root_logging_level: str
     file_logging_level: str
@@ -63,3 +68,4 @@ class Config:
     telegram: TelegramConfig
     logging: LoggingConfig
     preload_data: PreloadData
+    prometheus: Prometheus

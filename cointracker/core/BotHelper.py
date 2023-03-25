@@ -16,7 +16,7 @@ class BotHelper(BotHelperReplyMarkups):
     def __init__(self):
         super().__init__()
         self.tracker = Cointracker()
-        self.logger = logging.getLogger(__name__)
+        self.logger = logging.getLogger('main')
 
     def get_portfolio(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         query = update.callback_query

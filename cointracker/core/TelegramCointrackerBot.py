@@ -2,15 +2,18 @@ import logging
 import time
 from asyncio import Event
 from typing import Optional
+from warnings import filterwarnings
 
 from telegram import __version__ as TG_VER
 from telegram.ext import filters, MessageHandler
+from telegram.warnings import PTBUserWarning
 
 from cointracker.core.BotHelper import BotHelper
 from cointracker.core.BotHelperReplyMarkups import BotHelperReplyMarkups
 from cointracker.core.path_constants import INLINE_BUTTON_ROUTES, USER_INPUT_ROUTES, \
     END, UPDATE_MENU, GET_PORTFOLIO, UPDATE_PORTFOLIO, ADD_COIN, PORTFOLIO_PRICE, PORTFOLIO_PRICE_UPDATE, \
     SET_COIN_AMOUNT, START
+from cointracker.services.PrometheusClient import PrometheusClient
 
 try:
     from telegram import __version_info__
@@ -31,17 +34,21 @@ from telegram.ext import (
     ContextTypes,
     ConversationHandler,
 )
-from cointracker.utils.utils import run_thread, get_api_key, get_user_obj_from_update
+from cointracker.utils.utils import run_thread, get_api_key, get_user_obj_from_update, get_hostname
+
+filterwarnings(action="ignore", message=r".*CallbackQueryHandler", category=PTBUserWarning)
 
 
 class TelegramCointrackerBot:
 
-    def __init__(self, start_command_string: str = "start"):
+    def __init__(self, uuid: str = None, start_command_string: str = "start"):
         self.start_command_string = start_command_string
-        self.logger = logging.getLogger(__name__)
+        self.uuid = self.get_bot_uuid(uuid)
+        self.logger = logging.getLogger('main')
         self.helper = BotHelper()
         self.reply_markups = BotHelperReplyMarkups()
         self.application = self.init_bot()
+        self.requests_counter = PrometheusClient.get_metrics_obj("counter")
 
     def init_bot(self):
         api_key = get_api_key(api_name="Telegram")
@@ -51,7 +58,13 @@ class TelegramCointrackerBot:
         self.logger.debug("Done building bot backend!")
         return application
 
+    @staticmethod
+    def get_bot_uuid(uuid=None):
+        uuid = get_hostname() if not uuid else uuid
+        return uuid
+
     async def start(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
+        self.requests_counter.labels(self.uuid, "start").inc()
         user = get_user_obj_from_update(update)
         self.logger.info(
             f"User {user.first_name} {user.last_name} ({user.username}|{user.id}) started the conversation.")
@@ -66,6 +79,7 @@ class TelegramCointrackerBot:
                                                       reply_markup=self.helper.get_start_reply_markup())
         return INLINE_BUTTON_ROUTES
 
+    @PrometheusClient.get_metrics_obj("latency", bot_uuid=get_bot_uuid(), label="get_portfolio")
     async def get_portfolio(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
         user = get_user_obj_from_update(update)
         self.logger.debug(f"User: {user.full_name} in /get_portfolio")
