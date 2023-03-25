@@ -27,6 +27,9 @@ logging:
   console_logging_level: INFO   # Console Logger logging level
   other_loggers_enabled: yes    # Enable other loggers, besides main logger
 
+### Monitoring
+prometheus:
+  port: 9099
 
 ### Bot pre-start parameters
 preload_data:

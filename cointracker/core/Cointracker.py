@@ -16,7 +16,7 @@ class Cointracker:
     def __init__(self):
         self.db = get_db_connector()
         self.api = CoinmarketcapAPI()
-        self.logger = logging.getLogger(__name__)
+        self.logger = logging.getLogger('main')
 
     def set_coin_data(self, coin_symbol: str, data: dict):
         data["last_updated"] = time.time()
