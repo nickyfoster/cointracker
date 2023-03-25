@@ -33,4 +33,5 @@ jobs:
           TELEGRAM_BOT_API_KEY: ${{ secrets.TELEGRAM_BOT_API_KEY }}
           COINMARKETCAP_API_KEY: ${{ secrets.COINMARKETCAP_API_KEY }}
         run: |
-          pytest
+          pytest test/unit
+          pytest test/e2e
