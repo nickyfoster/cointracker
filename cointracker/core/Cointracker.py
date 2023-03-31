@@ -3,19 +3,19 @@ import logging
 import time
 from datetime import datetime
 
-from tabulate import tabulate
-
 from cointracker.core.CoinmarketcapAPI import CoinmarketcapAPI
 from cointracker.services.Exception import CustomException
 from cointracker.services.ExceptionCode import ExceptionCode
 from cointracker.services.ExceptionMessage import ExceptionMessage
-from cointracker.utils.utils import get_db_connector, update_nested_dict, prepare_coin_data
+from cointracker.utils.utils import get_db_connector, update_nested_dict, prepare_coin_data, CoinFromPortfolio, \
+    get_config
 
 
 class Cointracker:
     def __init__(self):
         self.db = get_db_connector()
         self.api = CoinmarketcapAPI()
+        self.config = get_config()
         self.logger = logging.getLogger('main')
 
     def set_coin_data(self, coin_symbol: str, data: dict):
@@ -66,7 +66,11 @@ class Cointracker:
 
     def get_portfolio_data(self):
         coins_symbols = self.list_coins()
+        if not coins_symbols:
+            raise CustomException(code=ExceptionCode.INTERNAL_SERVER_ERROR,
+                                  message=ExceptionMessage.COINTRACKER_DATA_PORTFOLIO_DATA_EMPTY)
         result = dict()
+
         for coin_symbol in coins_symbols:
             data = self.get_coin_data(coin_symbol)
             result[coin_symbol] = data
@@ -93,7 +97,6 @@ class Cointracker:
         return result
 
     def get_portfolio_description_str(self):
-
         data = prepare_coin_data(self.get_portfolio_data())
         last_updated = datetime.fromtimestamp(data["last_updated"]).strftime('%Y-%m-%d %H:%M:%S')
 
@@ -101,13 +104,17 @@ class Cointracker:
         for coin_symbol, data in data.items():
             if coin_symbol == "last_updated":
                 continue
-            coins.append(
-                [coin_symbol.upper(), f"{data['price']}$ ({data['change_24h']}%)",
-                 f"{data['holdings_price']}$ ({data['holdings_amount']})"])
+            coins.append(CoinFromPortfolio(symbol=coin_symbol.upper(),
+                                           name=data['name'],
+                                           price=data['price'],
+                                           change_24h=data['change_24h'],
+                                           holdings_price=data['holdings_price'],
+                                           holdings_amount=data['holdings_amount']))
 
-        sorted_coins = sorted(coins, key=lambda x: float(x[2].split("$")[0]))
-        coin_data_table = tabulate(sorted_coins,
-                                   headers=['Name', 'Price (change %)', 'Holdings (amount)'])
-        reply_text = f"{coin_data_table}\n\nLast updated: {last_updated}"
+        coins = sorted(coins, key=lambda x: float(x.holdings_price))
+        coins_text = ""
+        for coin in coins:
+            coins_text += f"{coin.__str__()}\n\n"
 
+        reply_text = f"{coins_text}\nLast updated: {last_updated}"
         return reply_text

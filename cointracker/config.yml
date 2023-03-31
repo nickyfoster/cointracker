@@ -36,3 +36,7 @@ preload_data:
   do_preload: no                # Flag
   data:                         # Data to preload during bot start
     btc: 1000
+
+### Feature flags
+feature_flags:
+  display_get_portfolio_as_list: no   # New portfolio display format

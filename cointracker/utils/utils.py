@@ -4,6 +4,7 @@ import logging
 import os
 import socket
 import threading
+from dataclasses import dataclass
 from datetime import datetime
 from json import JSONDecodeError
 from logging.handlers import RotatingFileHandler
@@ -49,12 +50,6 @@ def get_api_key(api_name: str) -> str:
     config = get_config()
     logger.debug(f"Looking for {api_name} API key")
 
-    # api_key = os.environ.get(f"{api_name.upper()}_API_KEY")
-    # if not api_key:
-    #     logger.debug(f"No ENV var for {api_name} API key found.\nGetting from config")
-    #     api_key = config.api.api_key
-    # logger.debug(f"Found {api_name} API key from env.") # TODO use string for accessing object vars
-    # return api_key
     if api_name == "Telegram":
         api_key = os.environ.get("TELEGRAM_BOT_API_KEY")
         if not api_key:
@@ -105,6 +100,34 @@ class CustomRotatingFileHandler(RotatingFileHandler):
         os.remove(old_log)
 
 
+@dataclass
+class CoinFromPortfolio:
+    symbol: str
+    name: str
+    price: float
+    change_24h: str
+    holdings_price: float
+    holdings_amount: float
+
+    def __str__(self):
+        if self.holdings_amount == 0:
+            return "({0}) {1}\nPrice: {2}$ ({3}%)".format(
+                self.symbol,
+                self.name,
+                self.price,
+                self.change_24h
+            )
+        else:
+            return "({0}) {1}\nPrice: {2}$ ({3}%)\nTotal: {4}$ ({5})".format(
+                self.symbol,
+                self.name,
+                self.price,
+                self.change_24h,
+                self.holdings_price,
+                self.holdings_amount
+            )
+
+
 def fix_all_loggers():
     is_active = get_config().logging.other_loggers_enabled
     for logger in logging.Logger.manager.loggerDict:
@@ -122,6 +145,7 @@ def prepare_coin_data(data: dict):
         holdings_price = holdings_amount * price
         res[coin_name] = {
             "price": round(price, 4),
+            "name": coin_data["name"],
             "holdings_amount": round(holdings_amount, 4),
             "holdings_price": round(holdings_price, 2),
             "change_24h": round(coin_data["quote"]["USD"]["percent_change_24h"], 2)

@@ -21,21 +21,17 @@ class BotHelper(BotHelperReplyMarkups):
     def get_portfolio(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         query = update.callback_query
         self.tracker.db.set_user_prefix(update.callback_query.from_user.id)
-        keyboard = self.get_keyboard([{"Yes": PORTFOLIO_PRICE_UPDATE, "Back": START}])
+        keyboard = self.get_keyboard([{"Update quotes": PORTFOLIO_PRICE_UPDATE, "Back": START}])
         if query.data == PORTFOLIO_PRICE_UPDATE:
             self.tracker.update_all_coins()
         try:
             price_data = self.tracker.get_portfolio_price()
-            if not price_data:
-                raise CustomException(code=ExceptionCode.INTERNAL_SERVER_ERROR,
-                                      message=ExceptionMessage.COINTRACKER_DATA_PORTFOLIO_DATA_EMPTY)
-            reply_text = "Portfolio price: {0:,} USD\n\n{1}\n\nUpdate price?".format(price_data["portfolio_price"],
+            reply_text = "Portfolio price: {0:,} USD\n\n{1}".format(price_data["portfolio_price"],
                                                                                      self.tracker.get_portfolio_description_str())
         except CustomException as e:
             reply_text = f"An error occurred.\nMessage: {e}"
             keyboard = self.get_keyboard([{"Back": START}])
             self.logger.error(e)
-
         return reply_text, self.get_inline_keyboard_markup_from_keyboard(keyboard)
 
     def add_coin(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -88,7 +84,6 @@ class BotHelper(BotHelperReplyMarkups):
                 coin_symbol = update.message.text.split(" ")[0]
                 coin_amount = update.message.text.split(" ")[1]
             except IndexError:
-                # TODO rewrite this bs
                 coin_symbol = coin_amount = -1
             keyboard, reply_text, coin_amount, coin_symbol = self.get_portfolio_update_metadata(
                 coin_symbol=coin_symbol,

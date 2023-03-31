@@ -61,6 +61,11 @@ class PreloadData:
     data: dict
 
 
+@dataclass
+class FeatureFlags:
+    display_get_portfolio_as_list: bool
+
+
 @nested_dataclass
 class Config:
     db: DBConfig
@@ -69,3 +74,4 @@ class Config:
     logging: LoggingConfig
     preload_data: PreloadData
     prometheus: Prometheus
+    feature_flags: FeatureFlags
