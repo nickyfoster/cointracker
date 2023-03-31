@@ -88,7 +88,7 @@ async def test_007_show_portfolio_with_new_coin(conv: Conversation):
 @pytest.mark.asyncio
 async def test_008_show_updated_portfolio(conv: Conversation):
     reply: Message = await go_to_show_portfolio_menu(conv)
-    assert "Update price?" in reply.text
+    assert "Last updated" in reply.text
     time_before_update = get_timestamp_from_portfolio_description_string(reply.text)
     await reply.buttons[0][0].click()
     wait(time=1.1)
@@ -120,6 +120,7 @@ async def test_009_update_coin(conv: Conversation):
     reply: Message = await go_to_show_portfolio_menu(conv)
     assert str(float(coin_update_amount)) == get_coin_amount_from_show_portfolio_menu(reply.text)
 
+
 @pytest.mark.asyncio
 async def test_010_update_coin_with_invalid_data(conv: Conversation):
     reply: Message = await go_to_update_coin_menu(conv)
@@ -128,11 +129,3 @@ async def test_010_update_coin_with_invalid_data(conv: Conversation):
     await reply.buttons[0][0].click()
     wait()
     await conv.send_message("NOT A VALID AMOUNT")
-
-# @pytest.mark.asyncio
-# async def test_010_all_back_buttons(conv: Conversation):
-#     pass
-
-# TODO tests:
-#   - Return buttons
-#   - Add multiple coins and test keyboard

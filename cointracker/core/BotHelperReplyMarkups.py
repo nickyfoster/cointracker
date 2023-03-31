@@ -1,4 +1,3 @@
-# TODO keep all keyboards here
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 
 from cointracker.core.path_constants import GET_PORTFOLIO, UPDATE_MENU, PORTFOLIO_PRICE_UPDATE, START, UPDATE_PORTFOLIO, \
